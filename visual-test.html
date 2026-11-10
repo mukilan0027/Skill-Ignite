@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Ignite - Visual Assessment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Import Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        /* CSS Variables & Theme (Minimal Modern) */
+        :root {
+            --bg-primary: #0F1115;
+            --bg-secondary: #181A20;
+            --bg-tertiary: #22252B;
+            
+            --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            --accent-yellow: #F59E0B;
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0AEC0;
+            --text-tertiary: #718096;
+            
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(24, 26, 32, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            
+            --glow-blue: 0 0 15px rgba(59, 130, 246, 0.2);
+            --glow-red: 0 0 15px rgba(239, 68, 68, 0.3);
+            
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Poppins', sans-serif;
+            
+            --border-radius-sm: 10px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+            --border-radius-round: 50%;
+            
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            
+            --sidebar-width: 260px;
+            --topbar-height: 80px;
+        }
+
+        /* Base Resets */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+        ul { list-style: none; }
+
+        /* Typography */
+        h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; color: var(--text-primary); }
+        .text-h2 { font-size: 2rem; letter-spacing: -0.5px; }
+        .text-h3 { font-size: 1.5rem; }
+        .text-h4 { font-size: 1.1rem; letter-spacing: 0.2px; }
+        .text-body { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+        .text-small { font-size: 0.85rem; color: var(--text-tertiary); }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Layout */
+        .app-container { display: flex; width: 100%; height: 100vh; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; height: 100%; overflow-y: auto; position: relative; }
+        .content-wrapper { padding: 32px 40px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width); height: 100vh;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 32px 0; display: flex; flex-direction: column;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand { padding: 0 28px 40px; display: flex; align-items: center; gap: 12px; }
+        .brand-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 16px; box-shadow: var(--glow-blue);
+        }
+        .brand-text { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
+
+        .nav-links { display: flex; flex-direction: column; gap: 4px; padding: 0 16px; flex-grow: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 20px;
+            border-radius: var(--border-radius-sm); color: var(--text-secondary);
+            font-weight: 500; font-size: 0.95rem; transition: all var(--transition-fast); position: relative;
+        }
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.08); color: var(--accent-blue); font-weight: 600; }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 3px;
+            background: var(--accent-blue); border-radius: 0 4px 4px 0;
+        }
+        .nav-item i { font-size: 1.1rem; width: 24px; text-align: center; }
+
+        /* Topbar Styles */
+        .topbar {
+            height: var(--topbar-height); width: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; background: rgba(15, 17, 21, 0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .topbar-title { font-size: 1.25rem; font-family: var(--font-heading); font-weight: 600; }
+        .user-controls { display: flex; align-items: center; gap: 24px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px; border-radius: 30px; transition: background 0.2s; }
+        .user-profile:hover { background: rgba(255,255,255,0.03); }
+        .avatar { width: 36px; height: 36px; border-radius: var(--border-radius-round); object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: 600; font-size: 0.85rem; }
+        .user-role { color: var(--text-tertiary); font-size: 0.7rem; }
+
+        /* --- VISUAL TEST PAGE SPECIFIC --- */
+        .header-section {
+            margin-bottom: 32px; display: flex; justify-content: space-between; align-items: flex-end;
+        }
+
+        .test-badge {
+            background: rgba(139, 92, 246, 0.1); color: var(--accent-purple);
+            padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;
+            border: 1px solid rgba(139, 92, 246, 0.2); display: inline-flex; align-items: center; gap: 6px;
+        }
+
+        .visual-layout {
+            display: grid;
+            grid-template-columns: 1.4fr 1fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 1100px) {
+            .visual-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Diagram Panel */
+        .diagram-panel {
+            padding: 24px; display: flex; flex-direction: column;
+            background: var(--bg-secondary); position: relative; overflow: hidden;
+        }
+
+        .diagram-header { display: flex; justify-content: space-between; margin-bottom: 16px; align-items: center; }
+        .diagram-toolbar { display: flex; gap: 12px; }
+        .tool-btn { 
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border-color);
+            color: var(--text-secondary); width: 32px; height: 32px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center; transition: all 0.2s;
+        }
+        .tool-btn:hover { background: rgba(255,255,255,0.1); color: var(--text-primary); }
+
+        .diagram-container {
+            flex-grow: 1; min-height: 400px; border-radius: var(--border-radius-sm);
+            background: #090A0C; border: 1px solid rgba(59, 130, 246, 0.2);
+            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Animated SVG Styles */
+        .diagram-svg { width: 100%; height: 100%; max-height: 500px; }
+        
+        .flow-line {
+            fill: none; stroke: var(--accent-blue); stroke-width: 3;
+            stroke-dasharray: 12 8; animation: energyFlow 1s linear infinite;
+        }
+        .flow-line-error {
+            fill: none; stroke: var(--accent-red); stroke-width: 3;
+            stroke-dasharray: 4 6; opacity: 0.6;
+        }
+        @keyframes energyFlow { to { stroke-dashoffset: -20; } }
+
+        .node-box { fill: rgba(34, 37, 43, 0.8); stroke: var(--border-color); stroke-width: 2; rx: 8; }
+        .node-text { fill: #fff; font-family: var(--font-heading); font-size: 14px; font-weight: 500; text-anchor: middle; }
+        .node-subtext { fill: var(--text-secondary); font-family: var(--font-main); font-size: 11px; text-anchor: middle; }
+        
+        .pulse-error { fill: var(--accent-red); animation: pulseRed 1.5s infinite; }
+        @keyframes pulseRed { 0% { r: 6; opacity: 1; } 100% { r: 18; opacity: 0; } }
+
+        /* Question Panel */
+        .question-panel { padding: 32px; display: flex; flex-direction: column; }
+        
+        .question-text { font-size: 1.15rem; line-height: 1.6; margin-bottom: 24px; color: var(--text-primary); }
+        .highlight { color: var(--accent-blue); font-weight: 600; }
+
+        .options-list { display: flex; flex-direction: column; gap: 16px; flex-grow: 1; }
+
+        .option-card {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm); padding: 16px 20px;
+            display: flex; gap: 16px; align-items: center; cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .option-card:hover {
+            background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.3);
+            transform: translateX(4px);
+        }
+
+        .option-card.selected {
+            background: rgba(59, 130, 246, 0.1); border-color: var(--accent-blue);
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.1);
+        }
+
+        .option-letter {
+            width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem;
+            color: var(--text-secondary); border: 1px solid transparent; transition: all 0.2s;
+        }
+
+        .option-card.selected .option-letter {
+            background: var(--accent-blue); color: white; border-color: var(--accent-blue);
+        }
+
+        .option-content { flex-grow: 1; font-size: 0.95rem; }
+
+        .action-area { margin-top: 32px; display: flex; justify-content: flex-end; border-top: 1px solid var(--border-color); padding-top: 24px; }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white; padding: 14px 32px; border-radius: 30px; font-weight: 600;
+            display: flex; align-items: center; gap: 10px; transition: all 0.2s; box-shadow: var(--glow-blue);
+        }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+
+        /* Feedback styling */
+        .feedback-msg {
+            display: none; padding: 16px; border-radius: var(--border-radius-sm); margin-top: 16px;
+            font-size: 0.9rem; align-items: flex-start; gap: 12px;
+        }
+        .feedback-msg.success { display: flex; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--text-primary); }
+        .feedback-msg.error { display: flex; background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--text-primary); }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="brand-text">Skill<span class="text-gradient">Ignite</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <a href="index.html" class="nav-item">
+                    <i class="fa-solid fa-border-all"></i> <span>Dashboard</span>
+                </a>
+                <a href="learning.html" class="nav-item">
+                    <i class="fa-solid fa-layer-group"></i> <span>Learning Tiers</span>
+                </a>
+                <a href="interview.html" class="nav-item">
+                    <i class="fa-solid fa-robot"></i> <span>AI Interview</span>
+                </a>
+                <a href="visual-test.html" class="nav-item active">
+                    <i class="fa-solid fa-diagram-project"></i> <span>Visual Test</span>
+                </a>
+                <a href="radar.html" class="nav-item">
+                    <i class="fa-solid fa-satellite-dish"></i> <span>Skill Radar</span>
+                </a>
+                <div style="flex-grow: 1;"></div>
+                <a href="home.html" class="nav-item" style="color: var(--text-tertiary);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Sign Out</span>
+                </a>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-title">Visual Diagnostics Assessment</div>
+                <div class="user-controls">
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Alex+M&background=22252B&color=fff" alt="User Avatar" class="avatar">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper fade-in">
+                
+                <div class="header-section">
+                    <div>
+                        <span class="test-badge mb-2"><i class="fa-solid fa-stopwatch"></i> Timed Scenario</span>
+                        <h1 class="text-h2" style="margin-top: 8px;">Powertrain Telemetry Analysis</h1>
+                        <p class="text-body mt-2">Analyze the live schematic below and answer the corresponding diagnostic question.</p>
+                    </div>
+                    <div class="text-h4 text-gradient">Question 1 of 5</div>
+                </div>
+
+                <div class="visual-layout">
+                    
+                    <!-- Left: Interactive Schematic -->
+                    <div class="glass-panel diagram-panel">
+                        <div class="diagram-header">
+                            <h3 class="text-h4"><i class="fa-solid fa-microchip" style="color: var(--accent-blue); margin-right: 8px;"></i> System Architecture Schematic</h3>
+                            <div class="diagram-toolbar">
+                                <button class="tool-btn" title="Zoom In"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                <button class="tool-btn" title="Zoom Out"><i class="fa-solid fa-magnifying-glass-minus"></i></button>
+                                <button class="tool-btn" title="Reset View"><i class="fa-solid fa-expand"></i></button>
+                            </div>
+                        </div>
+
+                        <div class="diagram-container">
+                            <svg viewBox="0 0 800 500" class="diagram-svg">
+                                <defs>
+                                    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                                        <feGaussianBlur stdDeviation="5" result="blur" />
+                                        <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                                    </filter>
+                                </defs>
+
+                                <!-- High Voltage Battery -->
+                                <rect x="50" y="200" width="160" height="100" class="node-box" stroke="var(--accent-green)" />
+                                <text x="130" y="245" class="node-text">HV Battery Pack</text>
+                                <text x="130" y="265" class="node-subtext" fill="var(--accent-green)">800V • Nominal Output</text>
+                                <circle cx="130" cy="285" r="4" fill="var(--accent-green)" />
+
+                                <!-- Traction Inverter -->
+                                <rect x="320" y="160" width="160" height="180" class="node-box" stroke="var(--accent-red)" filter="url(#glow)"/>
+                                <text x="400" y="220" class="node-text">Traction Inverter</text>
+                                <text x="400" y="240" class="node-subtext" fill="var(--accent-red)">Phase B Desync</text>
+                                
+                                <!-- Error Pulses inside Inverter -->
+                                <circle cx="400" cy="270" r="6" fill="var(--accent-red)" />
+                                <circle cx="400" cy="270" r="6" class="pulse-error" />
+                                <path d="M 385 285 L 415 285 M 400 270 L 400 300" stroke="var(--accent-red)" stroke-width="2" opacity="0.5"/>
+
+                                <!-- AC Motor -->
+                                <circle cx="650" cy="250" r="70" class="node-box" stroke="var(--accent-yellow)" />
+                                <text x="650" y="245" class="node-text">AC Motor</text>
+                                <text x="650" y="265" class="node-subtext" fill="var(--accent-yellow)">Torque Drop: 85%</text>
+
+                                <!-- BMS / Logic Controller -->
+                                <rect x="320" y="40" width="160" height="60" class="node-box" stroke="var(--text-tertiary)" />
+                                <text x="400" y="70" class="node-text" style="font-size: 12px;">VCU (Vehicle Control Unit)</text>
+
+                                <!-- Connections / Energy Flow -->
+                                <!-- Battery to Inverter (DC Flow) -->
+                                <path d="M 210 250 L 320 250" class="flow-line" />
+                                <text x="265" y="240" class="node-subtext">DC Bus</text>
+
+                                <!-- Inverter to Motor (AC Flow - Faulty) -->
+                                <path d="M 480 220 L 585 220" class="flow-line" />
+                                <path d="M 480 250 L 580 250" class="flow-line-error" /> <!-- The faulty Phase B -->
+                                <path d="M 480 280 L 585 280" class="flow-line" />
+                                <text x="530" y="210" class="node-subtext">3-Phase AC</text>
+
+                                <!-- VCU Data Lines -->
+                                <path d="M 400 100 L 400 160" stroke="var(--text-tertiary)" stroke-width="2" stroke-dasharray="4 4" />
+                                <path d="M 130 200 L 130 70 L 320 70" stroke="var(--text-tertiary)" stroke-width="2" stroke-dasharray="4 4" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Right: Question Area -->
+                    <div class="glass-panel question-panel">
+                        <div class="text-small text-tertiary" style="margin-bottom: 12px; font-weight: 500; letter-spacing: 1px;">DIAGNOSTIC SCENARIO</div>
+                        <h3 class="question-text">
+                            Based on the active schematic telemetry, the vehicle is experiencing an 85% sudden drop in motor torque. The VCU reports the DC Bus is stable at 800V. <span class="highlight">Which component is the root cause of the failure?</span>
+                        </h3>
+
+                        <div class="options-list" id="optionsList">
+                            <div class="option-card" data-correct="false" onclick="selectVisualOption(this)">
+                                <div class="option-letter">A</div>
+                                <div class="option-content"><strong>HV Battery Pack</strong> - Internal cell matrix thermal runaway causing voltage sag.</div>
+                            </div>
+                            
+                            <div class="option-card" data-correct="true" onclick="selectVisualOption(this)">
+                                <div class="option-letter">B</div>
+                                <div class="option-content"><strong>Traction Inverter</strong> - Phase B desynchronization failing to convert DC to 3-phase AC properly.</div>
+                            </div>
+                            
+                            <div class="option-card" data-correct="false" onclick="selectVisualOption(this)">
+                                <div class="option-letter">C</div>
+                                <div class="option-content"><strong>Vehicle Control Unit (VCU)</strong> - Lost CAN communication with the motor resolver.</div>
+                            </div>
+                            
+                            <div class="option-card" data-correct="false" onclick="selectVisualOption(this)">
+                                <div class="option-letter">D</div>
+                                <div class="option-content"><strong>AC Motor</strong> - Stator winding short to ground causing total mechanical bind.</div>
+                            </div>
+                        </div>
+
+                        <!-- Feedback Messages -->
+                        <div id="feedbackSuccess" class="feedback-msg success">
+                            <i class="fa-solid fa-circle-check" style="font-size: 1.2rem; color: var(--accent-green); margin-top: 2px;"></i>
+                            <div>
+                                <strong style="color: var(--accent-green);">Correct Diagnosis!</strong><br>
+                                <span style="color: var(--text-secondary);">The DC Bus line is flowing normally, isolating the battery. The red indicators on the Inverter and the broken Phase B AC line confirm an inversion failure, causing the torque drop at the motor.</span>
+                            </div>
+                        </div>
+
+                        <div id="feedbackError" class="feedback-msg error">
+                            <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.2rem; color: var(--accent-red); margin-top: 2px;"></i>
+                            <div>
+                                <strong style="color: var(--accent-red);">Incorrect Analysis</strong><br>
+                                <span style="color: var(--text-secondary);">Look closely at the energy flow paths in the schematic. The DC Bus line is operating nominally, but there is an error pulse inside the conversion block.</span>
+                            </div>
+                        </div>
+
+                        <div class="action-area">
+                            <button class="btn-submit" id="submitBtn" onclick="submitVisualAnswer()">
+                                Verify Diagnosis <i class="fa-solid fa-microchip"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Simple logic specifically for the visual test page
+        function selectVisualOption(element) {
+            // Clear previous selections
+            const options = document.querySelectorAll('.option-card');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selected class
+            element.classList.add('selected');
+            
+            // Hide feedback if making a new selection
+            document.getElementById('feedbackSuccess').style.display = 'none';
+            document.getElementById('feedbackError').style.display = 'none';
+        }
+
+        function submitVisualAnswer() {
+            const selectedOption = document.querySelector('.option-card.selected');
+            
+            if (!selectedOption) {
+                alert("Please select a diagnostic option before verifying.");
+                return;
+            }
+
+            const isCorrect = selectedOption.getAttribute('data-correct') === 'true';
+            
+            if (isCorrect) {
+                document.getElementById('feedbackSuccess').style.display = 'flex';
+                document.getElementById('feedbackError').style.display = 'none';
+                
+                // Change button state to "Next Question"
+                const btn = document.getElementById('submitBtn');
+                btn.innerHTML = 'Next Scenario <i class="fa-solid fa-arrow-right"></i>';
+                btn.style.background = 'linear-gradient(135deg, var(--accent-green), #059669)';
+            } else {
+                document.getElementById('feedbackSuccess').style.display = 'none';
+                document.getElementById('feedbackError').style.display = 'flex';
+                
+                // Visual shake effect for wrong answer
+                selectedOption.style.animation = 'shake 0.4s';
+                setTimeout(() => selectedOption.style.animation = '', 400);
+            }
+        }
+
+        // Add shake animation keyframes dynamically
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes shake {
+                0% { transform: translateX(0); }
+                25% { transform: translateX(-5px); border-color: var(--accent-red); }
+                50% { transform: translateX(5px); }
+                75% { transform: translateX(-5px); }
+                100% { transform: translateX(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

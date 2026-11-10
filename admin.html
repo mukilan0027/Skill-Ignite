@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Ignite - Module Uploader</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F1115;
+            color: #FFFFFF;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .admin-container {
+            background: rgba(24, 26, 32, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            border-radius: 16px;
+            width: 100%;
+            max-width: 800px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+
+        h2 { margin-top: 0; color: #3B82F6; }
+        h3 { margin-top: 0; color: #fff; font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px;}
+
+        .form-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label { font-size: 0.9rem; color: #A0AEC0; font-weight: 500; }
+        
+        input, select, textarea {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            font-family: inherit;
+            font-size: 0.95rem;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3B82F6;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .question-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(255,255,255,0.2);
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        
+        .auth-card {
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3B82F6, #8B5CF6);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .btn-outline { background: transparent; border: 1px solid #3B82F6; color: #3B82F6; }
+        .btn-outline:hover { background: rgba(59, 130, 246, 0.1); }
+
+        .header-actions { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 24px; }
+        
+        .status-msg { margin-bottom: 24px; padding: 12px; border-radius: 8px; display: none; }
+        .status-msg.success { display: block; background: rgba(16, 185, 129, 0.1); color: #10B981; border: 1px solid rgba(16,185,129,0.2); }
+        .status-msg.error { display: block; background: rgba(239, 68, 68, 0.1); color: #EF4444; border: 1px solid rgba(239,68,68,0.2); }
+        
+        #questions-list { margin-bottom: 24px; }
+        .q-preview { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 0.9rem; color: #A0AEC0; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-container">
+        <div class="header-actions">
+            <h2><i class="fa-solid fa-cloud-arrow-up"></i> Module MCQ Uploader</h2>
+            <button class="btn" id="upload-btn" onclick="uploadModule()">Publish to Firebase</button>
+        </div>
+
+        <div id="status" class="status-msg"></div>
+
+        <!-- 1. Authentication -->
+        <div class="question-card auth-card">
+            <h3 style="color: #3B82F6; border-color: rgba(59, 130, 246, 0.2);"><i class="fa-solid fa-lock"></i> 1. Admin Authentication</h3>
+            <div class="options-grid">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Registered Email</label>
+                    <input type="email" id="admin-email" placeholder="e.g. alex@example.com">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label>Password</label>
+                    <input type="password" id="admin-password" placeholder="••••••••">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Select Target -->
+        <div class="question-card">
+            <h3><i class="fa-solid fa-folder-tree"></i> 2. Select Target Module</h3>
+            <div class="form-group" style="margin-bottom: 0;">
+                <select id="module-select">
+                    <option value="battery_chemistries|Battery Chemistries">Tier 1: Battery Chemistries</option>
+                    <option value="high_voltage_safety|High Voltage Safety">Tier 1: High Voltage Safety</option>
+                    <option value="can_bus_basics|CAN Bus Basics">Tier 2: CAN Bus Basics</option>
+                    <option value="inverter_diagnostics|Inverter Diagnostics">Tier 2: Inverter Diagnostics</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="questions-list">
+            <!-- Added questions preview will show here -->
+        </div>
+
+        <!-- 3. Add Questions -->
+        <div class="question-card">
+            <h3><i class="fa-solid fa-pen-to-square"></i> 3. Add New Question</h3>
+            <div class="form-group">
+                <label>Question Text</label>
+                <textarea id="q-text" rows="3" placeholder="Enter the MCQ question here..."></textarea>
+            </div>
+            
+            <div class="options-grid">
+                <div class="form-group">
+                    <label>Option A</label>
+                    <input type="text" id="q-opt-a" placeholder="Text for option A">
+                </div>
+                <div class="form-group">
+                    <label>Option B</label>
+                    <input type="text" id="q-opt-b" placeholder="Text for option B">
+                </div>
+                <div class="form-group">
+                    <label>Option C</label>
+                    <input type="text" id="q-opt-c" placeholder="Text for option C">
+                </div>
+                <div class="form-group">
+                    <label>Option D</label>
+                    <input type="text" id="q-opt-d" placeholder="Text for option D">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Correct Answer</label>
+                <select id="q-correct">
+                    <option value="A">Option A</option>
+                    <option value="B">Option B</option>
+                    <option value="C">Option C</option>
+                    <option value="D">Option D</option>
+                </select>
+            </div>
+
+            <button class="btn btn-outline" onclick="addQuestion()">
+                <i class="fa-solid fa-plus"></i> Queue Question
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5hQdKwZxu4_c5TRagEnsa5mePmhEJ2yQ",
+            authDomain: "skill-ignite-6ef21.firebaseapp.com",
+            projectId: "skill-ignite-6ef21",
+            storageBucket: "skill-ignite-6ef21.firebasestorage.app",
+            messagingSenderId: "1052814923538",
+            appId: "1:1052814923538:web:53965e1039b75f02b6c5cb",
+            measurementId: "G-2C5CYQ16P3"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-skill-ignite';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State to hold questions before uploading
+        window.questionsArray = [];
+
+        window.addQuestion = () => {
+            const text = document.getElementById('q-text').value;
+            const optA = document.getElementById('q-opt-a').value;
+            const optB = document.getElementById('q-opt-b').value;
+            const optC = document.getElementById('q-opt-c').value;
+            const optD = document.getElementById('q-opt-d').value;
+            const correct = document.getElementById('q-correct').value;
+
+            if(!text || !optA || !optB || !optC || !optD) {
+                alert("Please fill out the question and all options.");
+                return;
+            }
+
+            const newQuestion = {
+                text: text,
+                options: [
+                    { letter: "A", text: optA },
+                    { letter: "B", text: optB },
+                    { letter: "C", text: optC },
+                    { letter: "D", text: optD }
+                ],
+                correctAnswer: correct
+            };
+
+            window.questionsArray.push(newQuestion);
+            
+            // Show preview
+            document.getElementById('questions-list').innerHTML += `
+                <div class="q-preview"><i class="fa-solid fa-check" style="color:#10B981"></i> Q${window.questionsArray.length}: ${text}</div>
+            `;
+
+            // Clear inputs
+            document.getElementById('q-text').value = '';
+            document.getElementById('q-opt-a').value = '';
+            document.getElementById('q-opt-b').value = '';
+            document.getElementById('q-opt-c').value = '';
+            document.getElementById('q-opt-d').value = '';
+        };
+
+        window.uploadModule = async () => {
+            const statusDiv = document.getElementById('status');
+            const email = document.getElementById('admin-email').value;
+            const password = document.getElementById('admin-password').value;
+            
+            if (!email || !password) {
+                statusDiv.className = 'status-msg error';
+                statusDiv.innerText = "Please provide your registered Email and Password in Step 1 to authenticate the upload.";
+                return;
+            }
+
+            if (window.questionsArray.length === 0) {
+                statusDiv.className = 'status-msg error';
+                statusDiv.innerText = "Please add at least one question to the queue first.";
+                return;
+            }
+
+            const moduleSelection = document.getElementById('module-select').value.split('|');
+            const moduleId = moduleSelection[0];
+            const moduleTitle = moduleSelection[1];
+
+            try {
+                statusDiv.className = 'status-msg';
+                statusDiv.innerText = "Authenticating and Uploading...";
+                statusDiv.style.display = 'block';
+
+                // Authenticate using the provided credentials
+                await signInWithEmailAndPassword(auth, email, password);
+
+                // Format matches exactly what learning.html expects
+                const moduleData = {
+                    title: moduleTitle,
+                    questions: window.questionsArray
+                };
+
+                const moduleRef = doc(db, 'artifacts', appId, 'public', 'data', 'learning_modules', moduleId);
+                await setDoc(moduleRef, moduleData);
+
+                statusDiv.className = 'status-msg success';
+                statusDiv.innerHTML = `<i class="fa-solid fa-circle-check"></i> Successfully uploaded ${window.questionsArray.length} questions to '${moduleTitle}'!`;
+                
+                // Clear array for next upload
+                window.questionsArray = [];
+                document.getElementById('questions-list').innerHTML = '';
+
+            } catch (error) {
+                console.error(error);
+                statusDiv.className = 'status-msg error';
+                statusDiv.innerText = `Error: ${error.message.replace('Firebase: ', '')}`;
+            }
+        };
+    </script>
+</body>
+</html>

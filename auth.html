@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Ignite - Login / Register</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Import Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        /* CSS Variables & Theme (Minimal Modern) */
+        :root {
+            --bg-primary: #0F1115;
+            --bg-secondary: #181A20;
+            --bg-tertiary: #22252B;
+            
+            --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0AEC0;
+            --text-tertiary: #718096;
+            
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(24, 26, 32, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            
+            --glow-blue: 0 0 15px rgba(59, 130, 246, 0.2);
+            --glow-purple: 0 0 15px rgba(139, 92, 246, 0.2);
+            
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Poppins', sans-serif;
+            
+            --border-radius-sm: 10px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+            
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+        }
+
+        /* Base Resets */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Background grid effect */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+
+        /* Typography */
+        h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; color: var(--text-primary); }
+        .text-h3 { font-size: 1.5rem; letter-spacing: -0.5px; margin-bottom: 8px; }
+        .text-body { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+
+        /* Brand Styles */
+        .brand { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center;
+            gap: 12px; 
+            margin-bottom: 32px;
+        }
+        .brand-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 18px; box-shadow: var(--glow-blue);
+        }
+        .brand-text { font-size: 1.6rem; font-family: var(--font-heading); font-weight: 700; letter-spacing: -0.5px; }
+
+        /* Auth Card Specifics */
+        .auth-card {
+            width: 100%;
+            max-width: 440px;
+            padding: 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Toggle Switch */
+        .auth-toggle {
+            display: flex;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-color);
+            border-radius: 30px;
+            padding: 4px;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            border-radius: 26px;
+            transition: all var(--transition-fast);
+            position: relative;
+            z-index: 2;
+        }
+
+        .toggle-btn.active {
+            color: var(--text-primary);
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 26px;
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+            z-index: 1;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Form Elements */
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .input-wrapper:focus-within {
+            border-color: rgba(59, 130, 246, 0.5);
+            background: rgba(255, 255, 255, 0.04);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 16px;
+            color: var(--text-tertiary);
+            font-size: 0.95rem;
+            transition: color var(--transition-fast);
+        }
+
+        .input-wrapper:focus-within i {
+            color: var(--accent-blue);
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .input-wrapper input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .auth-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+        }
+
+        .remember-me input[type="checkbox"] {
+            accent-color: var(--accent-blue);
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: var(--accent-blue);
+            transition: color var(--transition-fast);
+        }
+
+        .forgot-password:hover {
+            color: var(--accent-purple);
+            text-decoration: underline;
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            padding: 14px;
+            border-radius: var(--border-radius-sm);
+            font-weight: 600;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+            box-shadow: var(--glow-blue);
+            transition: all var(--transition-fast);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Divider */
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 24px 0;
+            color: var(--text-tertiary);
+            font-size: 0.85rem;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .divider span {
+            padding: 0 10px;
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 12px;
+            border-radius: var(--border-radius-sm);
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+        
+        .error-message {
+            color: var(--accent-red);
+            font-size: 0.85rem;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="glass-panel auth-card fade-in">
+        
+        <div class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-microchip"></i></div>
+            <div class="brand-text">Skill<span class="text-gradient">Ignite</span></div>
+        </div>
+
+        <div class="text-center" style="text-align: center; margin-bottom: 24px;">
+            <h2 class="text-h3" id="auth-title">Welcome Back</h2>
+            <p class="text-body" id="auth-subtitle">Enter your credentials to access your dashboard.</p>
+        </div>
+
+        <!-- Custom Toggle Switch -->
+        <div class="auth-toggle">
+            <div class="toggle-slider" id="toggle-slider"></div>
+            <button class="toggle-btn active" id="btn-login" onclick="switchTab('login')">Sign In</button>
+            <button class="toggle-btn" id="btn-register" onclick="switchTab('register')">Create Account</button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="login-form" class="auth-form">
+            <div class="input-group">
+                <label for="login-email">Email Address</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="email" id="login-email" placeholder="alex.mercer@example.com" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="login-password">Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="login-password" placeholder="••••••••" required>
+                </div>
+            </div>
+
+            <div class="auth-options">
+                <label class="remember-me">
+                    <input type="checkbox" checked> Remember me
+                </label>
+                <a href="#" class="forgot-password">Forgot Password?</a>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Sign In <i class="fa-solid fa-arrow-right-to-bracket"></i>
+            </button>
+        </form>
+
+        <!-- Register Form (Hidden by default) -->
+        <form id="register-form" class="auth-form hidden">
+            <div class="input-group">
+                <label for="reg-name">Full Name</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="reg-name" placeholder="Alex Mercer" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="reg-email">Work Email</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-envelope"></i>
+                    <input type="email" id="reg-email" placeholder="alex@engineering.com" required>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="reg-password">Create Password</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-lock"></i>
+                    <input type="password" id="reg-password" placeholder="Create a strong password" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit">
+                Create Account <i class="fa-solid fa-user-plus"></i>
+            </button>
+        </form>
+
+        <div class="divider"><span>OR CONTINUE WITH</span></div>
+
+        <button class="btn-outline">
+            <i class="fa-brands fa-google" style="color: #ea4335;"></i> Google SSO
+        </button>
+
+    </div>
+
+    <!-- UI Interaction Script -->
+    <script>
+        function switchTab(tab) {
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const slider = document.getElementById('toggle-slider');
+            const btnLogin = document.getElementById('btn-login');
+            const btnRegister = document.getElementById('btn-register');
+            const title = document.getElementById('auth-title');
+            const subtitle = document.getElementById('auth-subtitle');
+            
+            // Clear any error messages from DOM when switching
+            document.querySelectorAll('.error-message').forEach(el => el.remove());
+
+            if (tab === 'login') {
+                slider.style.transform = 'translateX(0)';
+                btnLogin.classList.add('active');
+                btnRegister.classList.remove('active');
+                
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                
+                title.innerText = 'Welcome Back';
+                subtitle.innerText = 'Enter your credentials to access your dashboard.';
+            } else {
+                slider.style.transform = 'translateX(100%)';
+                btnRegister.classList.add('active');
+                btnLogin.classList.remove('active');
+                
+                registerForm.classList.remove('hidden');
+                loginForm.classList.add('hidden');
+                
+                title.innerText = 'Join Skill Ignite';
+                subtitle.innerText = 'Map your cognitive logic and unlock your potential.';
+            }
+        }
+    </script>
+
+    <!-- Firebase Auth & Firestore Integration -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5hQdKwZxu4_c5TRagEnsa5mePmhEJ2yQ",
+            authDomain: "skill-ignite-6ef21.firebaseapp.com",
+            projectId: "skill-ignite-6ef21",
+            storageBucket: "skill-ignite-6ef21.firebasestorage.app",
+            messagingSenderId: "1052814923538",
+            appId: "1:1052814923538:web:53965e1039b75f02b6c5cb",
+            measurementId: "G-2C5CYQ16P3"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-skill-ignite';
+        
+        let auth, db;
+        try {
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error("Firebase Initialization Error:", e);
+        }
+
+        // Utility: Display error directly under the form button
+        const showError = (formId, message) => {
+            let errDiv = document.getElementById(`${formId}-error`);
+            if (!errDiv) {
+                errDiv = document.createElement('div');
+                errDiv.id = `${formId}-error`;
+                errDiv.className = 'error-message';
+                document.getElementById(formId).appendChild(errDiv);
+            }
+            errDiv.innerText = message;
+        };
+
+        // Handle Login Submission
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!auth) return showError('login-form', "Database connection unavailable.");
+
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const submitBtn = e.target.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+
+            try {
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Authenticating...';
+                submitBtn.disabled = true;
+
+                await signInWithEmailAndPassword(auth, email, password);
+                
+                // Route to app on successful validation
+                window.location.href = 'index.html'; 
+            } catch (error) {
+                showError('login-form', error.message.replace('Firebase: ', ''));
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Handle Registration & Store User Profile in Firestore
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            if(!auth || !db) return showError('register-form', "Database connection unavailable.");
+
+            const name = document.getElementById('reg-name').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const submitBtn = e.target.querySelector('.btn-submit');
+            const originalText = submitBtn.innerHTML;
+
+            try {
+                submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating Account...';
+                submitBtn.disabled = true;
+
+                // 1. Generate Auth Profile
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // 2. Create corresponding database document to hold stats/progression
+                const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid);
+                await setDoc(userDocRef, {
+                    fullName: name,
+                    email: email,
+                    role: 'EV Systems Eng. Level 1',
+                    createdAt: new Date().toISOString()
+                });
+
+                // Route to app on successful creation
+                window.location.href = 'index.html';
+            } catch (error) {
+                showError('register-form', error.message.replace('Firebase: ', ''));
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Ignite - AI Interview</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Import Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        /* CSS Variables & Theme (Minimal Modern) */
+        :root {
+            --bg-primary: #0F1115;
+            --bg-secondary: #181A20;
+            --bg-tertiary: #22252B;
+            
+            --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0AEC0;
+            --text-tertiary: #718096;
+            
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(24, 26, 32, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            
+            --glow-blue: 0 0 15px rgba(59, 130, 246, 0.2);
+            --glow-purple: 0 0 15px rgba(139, 92, 246, 0.2);
+            
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Poppins', sans-serif;
+            
+            --border-radius-sm: 10px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+            --border-radius-round: 50%;
+            
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            
+            --sidebar-width: 260px;
+            --topbar-height: 80px;
+        }
+
+        /* Base Resets */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+        ul { list-style: none; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+        /* Typography */
+        h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; color: var(--text-primary); }
+        .text-h2 { font-size: 2rem; letter-spacing: -0.5px; }
+        .text-h3 { font-size: 1.5rem; }
+        .text-h4 { font-size: 1.1rem; letter-spacing: 0.2px; }
+        .text-body { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+        .text-small { font-size: 0.85rem; color: var(--text-tertiary); }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Layout */
+        .app-container { display: flex; width: 100%; height: 100vh; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; height: 100%; overflow: hidden; position: relative; }
+        .content-wrapper { padding: 32px 40px; max-width: 1600px; margin: 0 auto; width: 100%; height: calc(100vh - var(--topbar-height)); display: flex; flex-direction: column; }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width); height: 100vh;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 32px 0; display: flex; flex-direction: column;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand { padding: 0 28px 40px; display: flex; align-items: center; gap: 12px; }
+        .brand-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 16px; box-shadow: var(--glow-blue);
+        }
+        .brand-text { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
+
+        .nav-links { display: flex; flex-direction: column; gap: 4px; padding: 0 16px; flex-grow: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 20px;
+            border-radius: var(--border-radius-sm); color: var(--text-secondary);
+            font-weight: 500; font-size: 0.95rem; transition: all var(--transition-fast); position: relative;
+        }
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.08); color: var(--accent-blue); font-weight: 600; }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 3px;
+            background: var(--accent-blue); border-radius: 0 4px 4px 0;
+        }
+        .nav-item i { font-size: 1.1rem; width: 24px; text-align: center; }
+
+        /* Topbar Styles */
+        .topbar {
+            height: var(--topbar-height); width: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; background: rgba(15, 17, 21, 0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .topbar-title { font-size: 1.25rem; font-family: var(--font-heading); font-weight: 600; }
+        .user-controls { display: flex; align-items: center; gap: 24px; }
+        
+        .icon-btn {
+            position: relative; width: 40px; height: 40px;
+            border-radius: var(--border-radius-round);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); transition: all var(--transition-fast);
+            border: 1px solid var(--border-color); background: rgba(255,255,255,0.02);
+        }
+        .icon-btn:hover { color: var(--text-primary); background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px; border-radius: 30px; transition: background 0.2s; }
+        .user-profile:hover { background: rgba(255,255,255,0.03); }
+        .avatar { width: 36px; height: 36px; border-radius: var(--border-radius-round); object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: 600; font-size: 0.85rem; }
+        .user-role { color: var(--text-tertiary); font-size: 0.7rem; }
+
+        /* --- INTERVIEW PAGE SPECIFIC --- */
+        .interview-container {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 24px;
+            height: 100%;
+            min-height: 0;
+        }
+
+        @media (max-width: 1024px) {
+            .interview-container { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+        }
+
+        /* Left Panel - AI Interviewer & Metrics */
+        .ai-panel {
+            display: flex; flex-direction: column; gap: 24px;
+            padding: 32px 24px; height: 100%; overflow-y: auto;
+        }
+
+        .ai-avatar-container {
+            display: flex; flex-direction: column; align-items: center;
+            padding-bottom: 30px; border-bottom: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .ai-avatar {
+            width: 110px; height: 110px; border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(139, 92, 246, 0.15) 0%, rgba(24, 26, 32, 0.8) 70%);
+            border: 1px solid rgba(139, 92, 246, 0.4);
+            display: flex; align-items: center; justify-content: center;
+            position: relative; box-shadow: var(--glow-purple); margin-bottom: 16px;
+        }
+        .ai-avatar i { font-size: 2.8rem; color: var(--text-primary); text-shadow: 0 0 15px rgba(139, 92, 246, 0.5); }
+
+        /* Voice Waveform Animation */
+        .waveform-animation {
+            position: absolute; bottom: -12px; display: flex; gap: 4px;
+            height: 24px; align-items: flex-end; opacity: 0; transition: opacity 0.3s ease;
+        }
+        .waveform-animation.active { opacity: 1; }
+        .bar { width: 3px; background: var(--accent-purple); border-radius: 2px; animation: bounce 0.5s infinite alternate ease-in-out; height: 5px; }
+        .bar:nth-child(1) { animation-delay: 0.1s; background: var(--accent-blue); }
+        .bar:nth-child(2) { animation-delay: 0.2s; }
+        .bar:nth-child(3) { animation-delay: 0.3s; background: var(--accent-blue); }
+        .bar:nth-child(4) { animation-delay: 0.2s; }
+        .bar:nth-child(5) { animation-delay: 0.4s; background: var(--accent-blue); }
+        @keyframes bounce { to { height: 20px; } }
+
+        .ai-name { font-family: var(--font-heading); font-weight: 600; font-size: 1.15rem; letter-spacing: 0.5px; }
+        .ai-status { font-size: 0.8rem; color: var(--accent-green); display: flex; align-items: center; gap: 6px; margin-top: 4px; transition: color 0.3s; }
+        .ai-status::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; box-shadow: 0 0 8px currentColor; }
+        .ai-status.thinking { color: var(--accent-purple); }
+
+        .metrics-container { flex-grow: 1; display: flex; flex-direction: column; gap: 20px; }
+        .metric-group { display: flex; flex-direction: column; gap: 8px; }
+        .metric-header { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        
+        .rt-bar-container { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; overflow: hidden; }
+        .rt-bar { height: 100%; border-radius: 2px; transition: width 0.5s ease-out; }
+        .rt-bar.confidence { background: linear-gradient(90deg, #3B82F6, #60A5FA); width: 85%; }
+        .rt-bar.clarity { background: linear-gradient(90deg, #10B981, #34D399); width: 92%; }
+        .rt-bar.accuracy { background: linear-gradient(90deg, #8B5CF6, #A78BFA); width: 78%; }
+
+        .btn-end {
+            background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--accent-red); padding: 12px; border-radius: var(--border-radius-sm);
+            font-weight: 500; font-size: 0.9rem; display: flex; justify-content: center; align-items: center; gap: 8px;
+            transition: all var(--transition-fast); margin-top: auto;
+        }
+        .btn-end:hover { background: rgba(239, 68, 68, 0.2); transform: translateY(-2px); }
+
+        /* Right Panel - Chat Area */
+        .chat-panel { display: flex; flex-direction: column; padding: 0; overflow: hidden; height: 100%; }
+
+        .chat-header {
+            padding: 20px 30px; border-bottom: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.01); display: flex; justify-content: space-between; align-items: center;
+        }
+        .scenario-badge {
+            background: rgba(59, 130, 246, 0.08); color: var(--accent-blue); padding: 6px 14px;
+            border-radius: 20px; font-size: 0.75rem; font-weight: 600; border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .chat-messages {
+            flex-grow: 1; padding: 30px; overflow-y: auto; display: flex; flex-direction: column; gap: 24px;
+        }
+
+        .message { display: flex; max-width: 75%; animation: fadeIn 0.3s ease; }
+        .ai-message { align-self: flex-start; }
+        .user-message { align-self: flex-end; flex-direction: row-reverse; }
+
+        .msg-bubble { padding: 16px 20px; border-radius: 20px; line-height: 1.5; position: relative; font-size: 0.95rem;}
+        
+        .ai-message .msg-bubble {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+            border-top-left-radius: 4px; color: var(--text-primary);
+        }
+        .user-message .msg-bubble {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(139, 92, 246, 0.1));
+            border: 1px solid rgba(59, 130, 246, 0.2); border-top-right-radius: 4px; color: var(--text-primary);
+        }
+
+        /* Typing indicator dots */
+        .typing-indicator { display: flex; gap: 4px; align-items: center; padding: 8px 4px; }
+        .typing-dot {
+            width: 6px; height: 6px; background-color: var(--text-secondary); border-radius: 50%;
+            animation: typing 1.4s infinite ease-in-out both;
+        }
+        .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+        .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+        @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+        .chat-input-area {
+            padding: 20px 30px; border-top: 1px solid var(--border-color);
+            background: rgba(255,255,255,0.01); display: flex; gap: 16px; align-items: center;
+        }
+
+        .input-wrapper {
+            flex-grow: 1; position: relative; display: flex; align-items: center;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+            border-radius: 30px; padding: 10px 20px; transition: all var(--transition-fast);
+        }
+        .input-wrapper:focus-within { border-color: rgba(59, 130, 246, 0.4); background: rgba(255,255,255,0.05); }
+        .input-wrapper input {
+            flex-grow: 1; background: transparent; border: none; color: var(--text-primary);
+            outline: none; padding: 6px; font-family: inherit; font-size: 0.95rem;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white; width: 46px; height: 46px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--glow-blue); transition: all var(--transition-fast); cursor: pointer; border: none;
+        }
+        .send-btn:hover { transform: scale(1.05); box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); }
+        .send-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="brand-text">Skill<span class="text-gradient">Ignite</span></div>
+            </div>
+            <ul class="nav-links">
+                <a href="index.html" class="nav-item">
+                    <i class="fa-solid fa-border-all"></i> <span>Dashboard</span>
+                </a>
+                <a href="learning.html" class="nav-item">
+                    <i class="fa-solid fa-layer-group"></i> <span>Learning Tiers</span>
+                </a>
+                <a href="interview.html" class="nav-item active">
+                    <i class="fa-solid fa-robot"></i> <span>AI Interview</span>
+                </a>
+                <a href="visual-test.html" class="nav-item">
+                    <i class="fa-solid fa-diagram-project"></i> <span>Visual Test</span>
+                </a>
+                <a href="radar.html" class="nav-item">
+                    <i class="fa-solid fa-satellite-dish"></i> <span>Skill Radar</span>
+                </a>
+                <div style="flex-grow: 1;"></div>
+                <a href="home.html" class="nav-item" style="color: var(--text-tertiary);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Sign Out</span>
+                </a>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content interview-content">
+            <header class="topbar">
+                <div class="topbar-title">Technical Calibration Workspace</div>
+                <div class="user-controls">
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Alex+M&background=22252B&color=fff" alt="User Avatar" class="avatar">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper fade-in">
+                <div class="interview-container">
+                    
+                    <!-- Left Panel (AI Interviewer & Metrics) -->
+                    <div class="glass-panel ai-panel">
+                        <div class="ai-avatar-container">
+                            <div class="ai-avatar">
+                                <i class="fa-solid fa-brain"></i>
+                                <div class="waveform-animation" id="ai-waveform">
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                </div>
+                            </div>
+                            <h2 class="ai-name">Nexus-7 (Gemini)</h2>
+                            <div class="ai-status" id="ai-status-indicator">Listening & Analyzing</div>
+                        </div>
+
+                        <div class="metrics-container">
+                            <div>
+                                <h3 class="text-h4" style="font-size: 1rem; margin-bottom: 4px;">Real-Time Diagnostics</h3>
+                                <p class="text-small" style="margin-bottom: 16px;">Evaluating current response telemetry.</p>
+                            </div>
+
+                            <div class="metric-group">
+                                <div class="metric-header">
+                                    <span>Vocal Confidence</span>
+                                    <span style="color: var(--accent-blue);" id="val-confidence">85%</span>
+                                </div>
+                                <div class="rt-bar-container"><div class="rt-bar confidence" id="bar-confidence"></div></div>
+                            </div>
+
+                            <div class="metric-group">
+                                <div class="metric-header">
+                                    <span>Explanation Clarity</span>
+                                    <span style="color: var(--accent-green);" id="val-clarity">92%</span>
+                                </div>
+                                <div class="rt-bar-container"><div class="rt-bar clarity" id="bar-clarity"></div></div>
+                            </div>
+
+                            <div class="metric-group">
+                                <div class="metric-header">
+                                    <span>Technical Accuracy</span>
+                                    <span style="color: var(--accent-purple);" id="val-accuracy">78%</span>
+                                </div>
+                                <div class="rt-bar-container"><div class="rt-bar accuracy" id="bar-accuracy"></div></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Acting only as a sandbox return -->
+                        <button class="btn-end" id="end-interview-btn" onclick="window.location.href='index.html'">
+                            <i class="fa-solid fa-stop-circle"></i> End Interview & Return
+                        </button>
+                    </div>
+
+                    <!-- Right Panel (Chat/Console) -->
+                    <div class="glass-panel chat-panel">
+                        <div class="chat-header">
+                            <div>
+                                <h3 class="text-h4" style="font-size: 1.05rem;">Scenario: EV Systems Engineering</h3>
+                                <div class="text-small mt-2" style="display: flex; align-items: center; gap: 6px;">
+                                    <i class="fa-regular fa-clock"></i> Live Technical Assessment
+                                </div>
+                            </div>
+                            <div class="scenario-badge">Intermediate Level</div>
+                        </div>
+
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Chat messages will be injected here dynamically -->
+                        </div>
+
+                        <div class="chat-input-area">
+                            <div class="input-wrapper">
+                                <input type="text" id="chat-input" placeholder="Type your technical response here..." autocomplete="off">
+                            </div>
+                            <button class="send-btn" id="send-btn">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Gemini AI Integration Script -->
+    <script>
+        const apiKey = "AIzaSyDPDJV1xC8waWWWwWPMpPqazeZXVL04mHA"; // Paste your actual API key here if running locally
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+        
+        // System Prompt to define the AI's persona
+        const systemPrompt = `You are Nexus-7, an advanced AI technical interviewer for Automotive EV (Electric Vehicle) Systems Engineering. 
+        Your goal is to conduct a professional, technical interview. 
+        Ask ONE specific technical question at a time about battery management, thermal dynamics, or CAN bus protocols. 
+        Wait for the user's answer before asking the next question. 
+        Briefly evaluate the user's previous answer (if any) before asking the next question. 
+        Keep your responses concise, professional, and strictly under 3 sentences.`;
+
+        // Maintain conversation history for Gemini's structured payload
+        let conversationHistory = [];
+
+        // DOM Elements
+        const chatMessages = document.getElementById('chat-messages');
+        const chatInput = document.getElementById('chat-input');
+        const sendBtn = document.getElementById('send-btn');
+        const aiStatusIndicator = document.getElementById('ai-status-indicator');
+        const aiWaveform = document.getElementById('ai-waveform');
+
+        // Metric Elements
+        const barConfidence = document.getElementById('bar-confidence');
+        const valConfidence = document.getElementById('val-confidence');
+        const barClarity = document.getElementById('bar-clarity');
+        const valClarity = document.getElementById('val-clarity');
+        const barAccuracy = document.getElementById('bar-accuracy');
+        const valAccuracy = document.getElementById('val-accuracy');
+
+        // Helper: Append a message to the chat UI
+        function appendMessage(text, role) {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', role === 'model' ? 'ai-message' : 'user-message');
+            
+            const innerHtml = `
+                <div class="msg-bubble">
+                    ${text}
+                </div>
+            `;
+            msgDiv.innerHTML = innerHtml;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight; // Auto-scroll to bottom
+        }
+
+        // Helper: Show/Hide typing indicator
+        function showTypingIndicator() {
+            const msgDiv = document.createElement('div');
+            msgDiv.classList.add('message', 'ai-message');
+            msgDiv.id = 'typing-indicator';
+            
+            msgDiv.innerHTML = `
+                <div class="msg-bubble">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            
+            // Update AI Status UI
+            aiStatusIndicator.innerText = "Analyzing Telemetry...";
+            aiStatusIndicator.classList.add('thinking');
+            aiWaveform.classList.add('active');
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            if (indicator) indicator.remove();
+            
+            // Revert AI Status UI
+            aiStatusIndicator.innerText = "Listening...";
+            aiStatusIndicator.classList.remove('thinking');
+            aiWaveform.classList.remove('active');
+        }
+
+        // Helper: Randomly shift real-time metrics to simulate active analysis
+        function updateLiveMetrics() {
+            const randomShift = (base) => Math.min(100, Math.max(60, base + Math.floor(Math.random() * 15 - 5)));
+            
+            const conf = randomShift(85);
+            const clar = randomShift(92);
+            const acc = randomShift(78);
+
+            barConfidence.style.width = `${conf}%`;
+            valConfidence.innerText = `${conf}%`;
+            
+            barClarity.style.width = `${clar}%`;
+            valClarity.innerText = `${clar}%`;
+            
+            barAccuracy.style.width = `${acc}%`;
+            valAccuracy.innerText = `${acc}%`;
+        }
+
+        // Exponential Backoff Fetch for API stability
+        async function fetchWithBackoff(url, options) {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < 6; i++) {
+                try {
+                    const response = await fetch(url, options);
+                    if (response.ok) return await response.json();
+                    
+                    const errorData = await response.json().catch(() => ({}));
+                    if (response.status === 503 || response.status === 429) {
+                        throw new Error(errorData.error?.message || "Rate limited");
+                    }
+                    return { error: errorData.error?.message || `HTTP ${response.status}: ${response.statusText}` };
+                } catch (error) {
+                    if (i === 5) throw error;
+                    await new Promise(resolve => setTimeout(resolve, delays[i]));
+                }
+            }
+        }
+
+        // Main logic to communicate with Gemini AI
+        async function handleInteraction(userText = null) {
+            sendBtn.disabled = true;
+            chatInput.disabled = true;
+
+            if (userText) {
+                appendMessage(userText, 'user');
+                conversationHistory.push({ role: "user", parts: [{ text: userText }] });
+                chatInput.value = '';
+            }
+
+            showTypingIndicator();
+            updateLiveMetrics(); // Simulate analysis
+
+            // Prepare Payload using proper Gemini Schema
+            const payload = {
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                contents: conversationHistory.length > 0 
+                    ? conversationHistory 
+                    : [{ role: "user", parts: [{ text: "Hello, I am ready to begin the EV technical interview." }] }]
+            };
+
+            try {
+                const data = await fetchWithBackoff(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                removeTypingIndicator();
+
+                if (data.error) {
+                    appendMessage(`<span style="color: var(--accent-red);"><b>System API Error:</b> ${data.error}</span>`, 'model');
+                    if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === "user") {
+                        conversationHistory.pop(); // Revert history to allow retry
+                    }
+                } else if (data.candidates && data.candidates[0]?.content?.parts?.[0]?.text) {
+                    const aiText = data.candidates[0].content.parts[0].text;
+                    conversationHistory.push({ role: "model", parts: [{ text: aiText }] });
+                    appendMessage(aiText, 'model');
+                } else {
+                    appendMessage(`<span style="color: var(--accent-yellow);"><b>System Warning:</b> Received an invalid response from Gemini.</span>`, 'model');
+                    if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === "user") {
+                        conversationHistory.pop();
+                    }
+                }
+
+            } catch (error) {
+                removeTypingIndicator();
+                console.error("API Error:", error);
+                
+                if (!apiKey || apiKey === "") {
+                    appendMessage(`<span style="color: var(--accent-red);"><b>System Error:</b> Please ensure your Google Gemini API Key is added in the HTML script section (line 431).</span>`, "model");
+                } else {
+                    appendMessage(`<span style="color: var(--accent-red);"><b>System Error:</b> Connection issue or model timeout. Details: ${error.message}</span>`, "model");
+                }
+                
+                if (conversationHistory.length > 0 && conversationHistory[conversationHistory.length - 1].role === "user") {
+                    conversationHistory.pop();
+                }
+            } finally {
+                sendBtn.disabled = false;
+                chatInput.disabled = false;
+                chatInput.focus();
+            }
+        }
+
+        // Event Listeners
+        sendBtn.addEventListener('click', () => {
+            const text = chatInput.value.trim();
+            if (text) handleInteraction(text);
+        });
+
+        chatInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const text = chatInput.value.trim();
+                if (text) handleInteraction(text);
+            }
+        });
+
+        // Initialize chat with the first AI greeting when the page loads
+        window.addEventListener('DOMContentLoaded', () => {
+            handleInteraction(); // Triggers the first prompt from the AI based on system instructions
+        });
+
+    </script>
+</body>
+</html>

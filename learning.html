@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Ignite - Learning Tiers</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Import Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        /* CSS Variables & Theme (Minimal Modern) */
+        :root {
+            --bg-primary: #0F1115;
+            --bg-secondary: #181A20;
+            --bg-tertiary: #22252B;
+            
+            --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0AEC0;
+            --text-tertiary: #718096;
+            
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(24, 26, 32, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            
+            --glow-blue: 0 0 15px rgba(59, 130, 246, 0.2);
+            --glow-purple: 0 0 15px rgba(139, 92, 246, 0.2);
+            
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Poppins', sans-serif;
+            
+            --border-radius-sm: 10px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+            --border-radius-round: 50%;
+            
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            
+            --sidebar-width: 260px;
+            --topbar-height: 80px;
+        }
+
+        /* Base Resets */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+        ul { list-style: none; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+        /* Typography */
+        h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; color: var(--text-primary); }
+        .text-h2 { font-size: 2rem; letter-spacing: -0.5px; }
+        .text-h3 { font-size: 1.5rem; }
+        .text-h4 { font-size: 1.1rem; letter-spacing: 0.2px; }
+        .text-body { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+        .text-small { font-size: 0.85rem; color: var(--text-tertiary); }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Layout */
+        .app-container { display: flex; width: 100%; height: 100vh; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; height: 100%; overflow-y: auto; position: relative; }
+        .content-wrapper { padding: 32px 40px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width); height: 100vh;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 32px 0; display: flex; flex-direction: column;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand { padding: 0 28px 40px; display: flex; align-items: center; gap: 12px; }
+        .brand-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 16px; box-shadow: var(--glow-blue);
+        }
+        .brand-text { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
+
+        .nav-links { display: flex; flex-direction: column; gap: 4px; padding: 0 16px; flex-grow: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 20px;
+            border-radius: var(--border-radius-sm); color: var(--text-secondary);
+            font-weight: 500; font-size: 0.95rem; transition: all var(--transition-fast); position: relative;
+        }
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.08); color: var(--accent-blue); font-weight: 600; }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 3px;
+            background: var(--accent-blue); border-radius: 0 4px 4px 0;
+        }
+        .nav-item i { font-size: 1.1rem; width: 24px; text-align: center; }
+
+        /* Topbar Styles */
+        .topbar {
+            height: var(--topbar-height); width: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; background: rgba(15, 17, 21, 0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .topbar-title { font-size: 1.25rem; font-family: var(--font-heading); font-weight: 600; }
+        .user-controls { display: flex; align-items: center; gap: 24px; }
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px; border-radius: 30px; transition: background 0.2s; }
+        .user-profile:hover { background: rgba(255,255,255,0.03); }
+        .avatar { width: 36px; height: 36px; border-radius: var(--border-radius-round); object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: 600; font-size: 0.85rem; }
+        .user-role { color: var(--text-tertiary); font-size: 0.7rem; }
+
+        /* --- LEARNING PAGE SPECIFIC --- */
+        .learning-header {
+            display: flex; align-items: center; justify-content: space-between; margin-bottom: 40px;
+        }
+        
+        .xp-badge {
+            background: rgba(16, 185, 129, 0.1); color: var(--accent-green);
+            padding: 10px 20px; border-radius: 30px; font-weight: 600; font-size: 0.95rem;
+            display: flex; align-items: center; gap: 8px; border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+        }
+
+        .tier-container { display: flex; flex-direction: column; gap: 40px; position: relative; }
+
+        /* Connecting line between tiers */
+        .tier-container::before {
+            content: ''; position: absolute; left: 30px; top: 40px; bottom: 40px;
+            width: 2px; background: rgba(255,255,255,0.05); z-index: 0;
+        }
+
+        .tier-progress-line {
+            position: absolute; left: 30px; top: 40px; width: 2px;
+            background: linear-gradient(to bottom, var(--accent-green) 0%, var(--accent-blue) 45%, transparent 100%);
+            z-index: 1; height: 50%;
+        }
+
+        .tier-row { display: flex; gap: 32px; position: relative; z-index: 2; }
+
+        .tier-indicator {
+            width: 60px; min-width: 60px; height: 60px; border-radius: 50%;
+            background: var(--bg-secondary); border: 2px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; color: var(--text-tertiary); transition: all var(--transition-normal);
+            position: relative; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .tier-row.completed .tier-indicator {
+            background: rgba(16, 185, 129, 0.1); border-color: var(--accent-green);
+            color: var(--accent-green); box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .tier-row.active .tier-indicator {
+            background: rgba(59, 130, 246, 0.1); border-color: var(--accent-blue);
+            color: var(--accent-blue); box-shadow: 0 0 20px rgba(59, 130, 246, 0.2);
+            animation: pulseGlow 2s infinite;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.4); }
+            100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.2); }
+        }
+
+        .tier-content { flex-grow: 1; }
+        .tier-card { padding: 32px; position: relative; overflow: hidden; }
+        
+        .tier-row.completed .tier-card { border-left: 3px solid var(--accent-green); }
+        .tier-row.active .tier-card { border-left: 3px solid var(--accent-blue); }
+        .tier-row.server-test .tier-card { border-left: 3px solid var(--accent-purple); }
+
+        .tier-header {
+            display: flex; justify-content: space-between; align-items: flex-start;
+            margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);
+        }
+        
+        .tier-title-area h2 { margin-bottom: 6px; font-size: 1.4rem; }
+        .tier-row.completed .tier-title-area h2 { color: var(--text-primary); }
+        .tier-row.active .tier-title-area h2 { color: var(--text-primary); }
+        .tier-row.server-test .tier-title-area h2 { color: var(--accent-purple); }
+
+        .tier-stats { text-align: right; }
+
+        .lessons-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+
+        .lesson-item {
+            background: rgba(255,255,255,0.015); border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm); padding: 16px; display: flex; gap: 16px;
+            transition: all var(--transition-fast); cursor: pointer; align-items: center;
+        }
+        
+        .lesson-item.locked { opacity: 0.6; cursor: not-allowed; }
+        .lesson-item:not(.locked):hover {
+            background: rgba(255,255,255,0.04); border-color: rgba(255,255,255,0.1);
+            transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .lesson-icon {
+            width: 44px; height: 44px; border-radius: 10px;
+            background: rgba(255,255,255,0.03); display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem; color: var(--text-secondary); border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .lesson-item.done .lesson-icon { background: rgba(16, 185, 129, 0.1); color: var(--accent-green); border-color: rgba(16, 185, 129, 0.2); }
+        .lesson-item.current .lesson-icon { background: rgba(59, 130, 246, 0.1); color: var(--accent-blue); border-color: rgba(59, 130, 246, 0.2); }
+
+        .lesson-info { flex-grow: 1; }
+        .lesson-title { font-weight: 500; font-size: 0.95rem; margin-bottom: 4px; color: var(--text-primary); }
+        .lesson-meta { font-size: 0.75rem; color: var(--text-tertiary); display: flex; gap: 12px; }
+        
+        .lesson-action { display: flex; align-items: center; color: var(--text-tertiary); font-size: 1.1rem; transition: color 0.2s; }
+        .lesson-item:not(.locked):hover .lesson-action { color: var(--accent-blue); transform: translateX(3px); }
+        .lesson-item.done .lesson-action { color: var(--accent-green); }
+        .lesson-item.current .lesson-action { color: var(--accent-blue); }
+
+        .interactive-test-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border-color);
+            color: var(--text-secondary); padding: 10px 20px; border-radius: 30px;
+            font-weight: 500; font-size: 0.9rem; margin-top: 24px; transition: all var(--transition-fast);
+        }
+        
+        .interactive-test-btn:hover { background: rgba(255,255,255,0.06); color: var(--text-primary); border-color: rgba(255,255,255,0.1); }
+        
+        /* Server Test Specific Styling */
+        .server-terminal {
+            background: #090A0C; border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: var(--border-radius-sm); padding: 20px; font-family: monospace;
+            color: var(--text-secondary); font-size: 0.85rem; line-height: 1.5; margin-top: 16px;
+        }
+        .server-line { margin-bottom: 8px; display: flex; gap: 10px; }
+        .server-line .prompt { color: var(--accent-purple); }
+        .server-line .status { color: var(--accent-green); }
+        .server-line .pending { color: #FCD34D; }
+
+        /* --- MODULE OVERLAY SPECIFIC STYLES --- */
+        .module-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(15, 17, 21, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            z-index: 1000; /* Above sidebar */
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: all 0.3s ease;
+        }
+        
+        .module-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .module-modal {
+            width: 90%; max-width: 900px; height: 85vh;
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex; flex-direction: column; overflow: hidden;
+            transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .module-overlay.active .module-modal { transform: translateY(0); }
+
+        .module-header {
+            padding: 24px 32px; border-bottom: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .module-title { display: flex; align-items: center; gap: 12px; }
+        .module-title i { color: var(--accent-blue); font-size: 1.5rem; }
+        .module-title h2 { font-size: 1.3rem; margin: 0; }
+
+        .btn-close-modal {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(255,255,255,0.05); color: var(--text-secondary);
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; font-size: 1.2rem; border: 1px solid transparent;
+        }
+        .btn-close-modal:hover { background: rgba(239, 68, 68, 0.1); color: var(--accent-red); border-color: rgba(239, 68, 68, 0.3); transform: rotate(90deg); }
+
+        .module-body {
+            flex-grow: 1; padding: 40px; overflow-y: auto; position: relative;
+        }
+
+        /* Mock Loading State */
+        .module-loader {
+            position: absolute; inset: 0; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; background: var(--bg-secondary);
+            z-index: 10; gap: 16px; transition: opacity 0.3s ease;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: var(--accent-blue); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Question UI */
+        .question-block { display: none; animation: fadeIn 0.5s ease; }
+        .progress-bar-container { width: 100%; height: 6px; background: rgba(255,255,255,0.05); border-radius: 3px; margin-bottom: 30px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; background: var(--accent-blue); border-radius: 3px; transition: width 0.3s ease; }
+        
+        .question-meta { display: flex; justify-content: space-between; color: var(--text-tertiary); font-size: 0.85rem; margin-bottom: 12px; font-weight: 500; }
+        .question-text { font-size: 1.2rem; font-weight: 500; line-height: 1.6; margin-bottom: 32px; color: var(--text-primary); }
+
+        .options-grid { display: grid; gap: 16px; }
+        .quiz-option {
+            background: rgba(255,255,255,0.02); border: 1px solid var(--border-color);
+            padding: 20px; border-radius: var(--border-radius-sm); cursor: pointer;
+            transition: all 0.2s; display: flex; align-items: center; gap: 16px;
+        }
+        .quiz-option:hover { background: rgba(59, 130, 246, 0.05); border-color: rgba(59, 130, 246, 0.3); }
+        .quiz-option.selected { background: rgba(59, 130, 246, 0.1); border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(59, 130, 246, 0.1); }
+        
+        .option-letter {
+            width: 32px; height: 32px; border-radius: 8px; background: rgba(255,255,255,0.05);
+            display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.9rem;
+            color: var(--text-secondary); transition: all 0.2s;
+        }
+        .quiz-option.selected .option-letter { background: var(--accent-blue); color: white; }
+        .option-text-content { font-size: 0.95rem; }
+
+        /* Feedback styling */
+        .feedback-msg { display: none; padding: 16px; border-radius: var(--border-radius-sm); margin-top: 24px; font-size: 0.9rem; align-items: flex-start; gap: 12px; animation: fadeIn 0.3s ease;}
+        .feedback-msg.success { background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: var(--text-primary); }
+        .feedback-msg.error { background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--text-primary); }
+
+        .module-footer {
+            padding: 24px 32px; border-top: 1px solid var(--border-color);
+            display: flex; justify-content: space-between; align-items: center;
+            background: rgba(255,255,255,0.01);
+        }
+        
+        .btn-next {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white; padding: 12px 28px; border-radius: 30px; font-weight: 600;
+            display: flex; align-items: center; gap: 8px; transition: all 0.2s; box-shadow: var(--glow-blue);
+        }
+        .btn-next:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+
+        /* Shake animation for incorrect answer */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); border-color: var(--accent-red); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="brand-text">Skill<span class="text-gradient">Ignite</span></div>
+            </div>
+            
+            <ul class="nav-links">
+                <a href="index.html" class="nav-item">
+                    <i class="fa-solid fa-border-all"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="learning.html" class="nav-item active">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Learning Tiers</span>
+                </a>
+                <a href="interview.html" class="nav-item">
+                    <i class="fa-solid fa-robot"></i>
+                    <span>AI Interview</span>
+                </a>
+                <a href="visual-test.html" class="nav-item">
+                    <i class="fa-solid fa-diagram-project"></i>
+                    <span>Visual Test</span>
+                </a>
+                <a href="radar.html" class="nav-item">
+                    <i class="fa-solid fa-satellite-dish"></i>
+                    <span>Skill Radar</span>
+                </a>
+                <div style="flex-grow: 1;"></div>
+                <a href="home.html" class="nav-item" style="color: var(--text-tertiary);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Sign Out</span>
+                </a>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content learning-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-title">Skill Progression Pathway</div>
+                <div class="user-controls">
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Alex+M&background=22252B&color=fff" alt="Avatar" class="avatar">
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper fade-in">
+                
+                <div class="learning-header">
+                    <div>
+                        <h1 class="text-h2">EV Systems Engineering Path</h1>
+                        <p class="text-body mt-2">Modules unlock progressively as you demonstrate competence. Final certification awaits backend evaluation.</p>
+                    </div>
+                    <div class="xp-badge">
+                        <i class="fa-solid fa-star"></i> <span id="total-xp">2450</span> XP Total
+                    </div>
+                </div>
+
+                <div class="tier-container">
+                    <div class="tier-progress-line"></div>
+
+                    <!-- Tier 1: Beginner -->
+                    <div class="tier-row completed">
+                        <div class="tier-indicator"><i class="fa-solid fa-check"></i></div>
+                        <div class="tier-content">
+                            <div class="glass-panel tier-card">
+                                <div class="tier-header">
+                                    <div class="tier-title-area">
+                                        <div class="text-small" style="color: var(--accent-green); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Tier 1</div>
+                                        <h2>Foundation: EV Basics</h2>
+                                        <p class="text-body" style="font-size: 0.9rem;">Core principles of electric drivetrains and safety protocols.</p>
+                                    </div>
+                                    <div class="tier-stats">
+                                        <div class="text-h3" style="color: var(--accent-green);">100%</div>
+                                        <div class="text-small">Completed</div>
+                                    </div>
+                                </div>
+
+                                <div class="lessons-grid">
+                                    <!-- Using exact module ID from Firebase inside onclick -->
+                                    <div class="lesson-item done" onclick="openModule('Battery Chemistries', 'fa-battery-half', 'battery_chemistries')">
+                                        <div class="lesson-icon"><i class="fa-solid fa-battery-half"></i></div>
+                                        <div class="lesson-info">
+                                            <div class="lesson-title">Battery Chemistries</div>
+                                            <div class="lesson-meta">
+                                                <span><i class="fa-regular fa-clock"></i> 45m</span>
+                                                <span><i class="fa-solid fa-star"></i> 100 XP</span>
+                                            </div>
+                                        </div>
+                                        <div class="lesson-action"><i class="fa-solid fa-arrow-right"></i></div>
+                                    </div>
+                                    <div class="lesson-item done" onclick="openModule('High Voltage Safety', 'fa-shield-halved', 'high_voltage_safety')">
+                                        <div class="lesson-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                                        <div class="lesson-info">
+                                            <div class="lesson-title">High Voltage Safety</div>
+                                            <div class="lesson-meta">
+                                                <span><i class="fa-regular fa-clock"></i> 1h 20m</span>
+                                                <span><i class="fa-solid fa-star"></i> 150 XP</span>
+                                            </div>
+                                        </div>
+                                        <div class="lesson-action"><i class="fa-solid fa-arrow-right"></i></div>
+                                    </div>
+                                </div>
+                                
+                                <button class="interactive-test-btn" style="color: var(--accent-green); border-color: rgba(16, 185, 129, 0.3);">
+                                    <i class="fa-solid fa-certificate"></i> View Tier 1 Certificate
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tier 2: Intermediate (Progressive Unlocking) -->
+                    <div class="tier-row active">
+                        <div class="tier-indicator"><i class="fa-solid fa-bolt"></i></div>
+                        <div class="tier-content">
+                            <div class="glass-panel tier-card">
+                                <div class="tier-header">
+                                    <div class="tier-title-area">
+                                        <div class="text-small" style="color: var(--accent-blue); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Tier 2</div>
+                                        <h2>Intermediate: Systems Diagnostics</h2>
+                                        <p class="text-body" style="font-size: 0.9rem;">Understanding CAN bus, inverter logic, and subsystem interactions.</p>
+                                    </div>
+                                    <div class="tier-stats">
+                                        <div class="text-h3" style="color: var(--accent-blue);">In Progress</div>
+                                        <div class="text-small">Select Next Module</div>
+                                    </div>
+                                </div>
+
+                                <div class="lessons-grid">
+                                    <div class="lesson-item done" onclick="openModule('CAN Bus Basics', 'fa-network-wired', 'can_bus_basics')">
+                                        <div class="lesson-icon"><i class="fa-solid fa-network-wired"></i></div>
+                                        <div class="lesson-info">
+                                            <div class="lesson-title">CAN Bus Basics</div>
+                                            <div class="lesson-meta">
+                                                <span style="color: var(--accent-green);"><i class="fa-solid fa-check"></i> Completed</span>
+                                                <span><i class="fa-solid fa-star"></i> 200 XP</span>
+                                            </div>
+                                        </div>
+                                        <div class="lesson-action"><i class="fa-solid fa-arrow-right"></i></div>
+                                    </div>
+                                    
+                                    <div class="lesson-item current" onclick="openModule('Inverter Diagnostics', 'fa-play', 'inverter_diagnostics')">
+                                        <div class="lesson-icon"><i class="fa-solid fa-play"></i></div>
+                                        <div class="lesson-info">
+                                            <div class="lesson-title">Inverter Diagnostics</div>
+                                            <div class="lesson-meta">
+                                                <span style="color: var(--accent-blue);">Ready to Start</span>
+                                                <span><i class="fa-solid fa-star"></i> 300 XP</span>
+                                            </div>
+                                        </div>
+                                        <div class="lesson-action"><i class="fa-solid fa-arrow-right"></i></div>
+                                    </div>
+                                    
+                                    <div class="lesson-item locked">
+                                        <div class="lesson-icon"><i class="fa-solid fa-temperature-arrow-down"></i></div>
+                                        <div class="lesson-info">
+                                            <div class="lesson-title">Thermal Management</div>
+                                            <div class="lesson-meta">
+                                                <span>Up Next</span>
+                                                <span><i class="fa-solid fa-star"></i> 250 XP</span>
+                                            </div>
+                                        </div>
+                                        <div class="lesson-action"><i class="fa-solid fa-hourglass-half"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tier 3: Server Side Test -->
+                    <div class="tier-row server-test">
+                        <div class="tier-indicator"><i class="fa-solid fa-server"></i></div>
+                        <div class="tier-content">
+                            <div class="glass-panel tier-card">
+                                <div class="tier-header" style="border-bottom: none; margin-bottom: 0; padding-bottom: 0;">
+                                    <div class="tier-title-area">
+                                        <div class="text-small" style="color: var(--accent-purple); text-transform: uppercase; font-weight: 700; letter-spacing: 1px;">Tier 3 • Final Assessment</div>
+                                        <h2>Advanced Architecture Integration</h2>
+                                        <p class="text-body" style="font-size: 0.9rem;">Complete vehicle systems integration, V2G protocols, and advanced BMS logic.</p>
+                                    </div>
+                                    <div class="tier-stats">
+                                        <div class="text-h3" style="color: var(--text-tertiary); font-size: 1.2rem;">Pending Connection</div>
+                                    </div>
+                                </div>
+
+                                <div class="server-terminal">
+                                    <div class="server-line">
+                                        <span class="prompt">root@skill-ignite:~#</span>
+                                        <span>initiate_tier3_evaluation --user="Alex Mercer"</span>
+                                    </div>
+                                    <div class="server-line">
+                                        <span class="status">[OK]</span>
+                                        <span>User authentication verified.</span>
+                                    </div>
+                                    <div class="server-line">
+                                        <span class="status">[OK]</span>
+                                        <span>Checking prerequisites (Tier 1 & Tier 2)...</span>
+                                    </div>
+                                    <div class="server-line">
+                                        <span class="pending">[PENDING]</span>
+                                        <span>Waiting for backend test data generation. Dynamic questions will be loaded securely from the server.</span>
+                                    </div>
+                                </div>
+                                
+                                <button class="interactive-test-btn" style="color: var(--accent-purple); border-color: rgba(139, 92, 246, 0.3);">
+                                    <i class="fa-solid fa-satellite-dish"></i> Connect to Backend Test Engine
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODULE OVERLAY (Inside Page Modal) -->
+    <div class="module-overlay" id="module-overlay">
+        <div class="module-modal">
+            
+            <div class="module-header">
+                <div class="module-title">
+                    <i id="modal-icon" class="fa-solid fa-book-open"></i>
+                    <h2 id="modal-title">Module Loading...</h2>
+                </div>
+                <button class="btn-close-modal" onclick="closeModule()">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="module-body">
+                <!-- Loader (simulating backend fetch) -->
+                <div class="module-loader" id="module-loader">
+                    <div class="spinner"></div>
+                    <div class="text-small text-secondary" id="loader-text">Fetching dynamic questions from secure backend...</div>
+                </div>
+
+                <!-- Dynamic Questions Container -->
+                <div class="question-block" id="question-block">
+                    <div class="progress-bar-container">
+                        <div class="progress-fill" id="modal-progress-fill"></div>
+                    </div>
+                    
+                    <div class="question-meta">
+                        <span id="question-meta-text">Question 1 of 1</span>
+                        <span style="color: var(--accent-blue);"><i class="fa-solid fa-server"></i> Verified via Backend</span>
+                    </div>
+
+                    <h3 class="question-text" id="dynamic-question-text">Loading question text...</h3>
+
+                    <!-- Options will be injected here by JS -->
+                    <div class="options-grid" id="dynamic-options-grid"></div>
+
+                    <!-- Feedback Messages -->
+                    <div id="modal-feedback-success" class="feedback-msg success">
+                        <i class="fa-solid fa-circle-check" style="font-size: 1.2rem; color: var(--accent-green); margin-top: 2px;"></i>
+                        <div>
+                            <strong style="color: var(--accent-green);">Correct!</strong><br>
+                            <span style="color: var(--text-secondary);">Your diagnostic reasoning is aligned with the core engineering principles.</span>
+                        </div>
+                    </div>
+
+                    <div id="modal-feedback-error" class="feedback-msg error">
+                        <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.2rem; color: var(--accent-red); margin-top: 2px;"></i>
+                        <div>
+                            <strong style="color: var(--accent-red);">Incorrect</strong><br>
+                            <span style="color: var(--text-secondary);">Review the fundamental principles and try again.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="module-footer">
+                <button class="interactive-test-btn" style="margin-top: 0; background: transparent; border: none; padding-left: 0;" onclick="closeModule()">
+                    Quit Module
+                </button>
+                <button class="btn-next" id="modal-submit-btn" onclick="submitModalAnswer()">
+                    Submit Answer <i class="fa-solid fa-arrow-right"></i>
+                </button>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <!-- Firebase Integration for Dynamic Modules -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Firebase Setup
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5hQdKwZxu4_c5TRagEnsa5mePmhEJ2yQ",
+            authDomain: "skill-ignite-6ef21.firebaseapp.com",
+            projectId: "skill-ignite-6ef21",
+            storageBucket: "skill-ignite-6ef21.firebasestorage.app",
+            messagingSenderId: "1052814923538",
+            appId: "1:1052814923538:web:53965e1039b75f02b6c5cb",
+            measurementId: "G-2C5CYQ16P3"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-skill-ignite';
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // State variables for the current active module
+        let currentModuleQuestions = [];
+        let currentQuestionIdx = 0;
+        let selectedAnswer = null;
+        let isAnswered = false;
+
+        // Make functions globally available for inline HTML onclick handlers
+        window.openModule = async (title, iconClass, moduleId) => {
+            const overlay = document.getElementById('module-overlay');
+            const titleEl = document.getElementById('modal-title');
+            const iconEl = document.getElementById('modal-icon');
+            const loader = document.getElementById('module-loader');
+            const loaderText = document.getElementById('loader-text');
+            const content = document.getElementById('question-block');
+            
+            // Reset UI state
+            titleEl.innerText = title;
+            iconEl.className = `fa-solid ${iconClass}`;
+            overlay.classList.add('active');
+            loader.style.display = 'flex';
+            loader.style.opacity = '1';
+            content.style.display = 'none';
+            loaderText.innerText = "Fetching dynamic questions from secure backend...";
+            
+            try {
+                // Fetch the specific module from Firestore
+                const moduleRef = doc(db, 'artifacts', appId, 'public', 'data', 'learning_modules', moduleId);
+                const docSnap = await getDoc(moduleRef);
+                
+                if (docSnap.exists() && docSnap.data().questions) {
+                    currentModuleQuestions = docSnap.data().questions;
+                    currentQuestionIdx = 0;
+                    
+                    // Artificial delay for smooth UI transition
+                    setTimeout(() => {
+                        renderQuestion(currentQuestionIdx);
+                        loader.style.opacity = '0';
+                        setTimeout(() => {
+                            loader.style.display = 'none';
+                            content.style.display = 'block';
+                        }, 300);
+                    }, 800);
+                    
+                } else {
+                    loaderText.innerText = "Module data not found on server. Please run Admin Setup tool.";
+                    loaderText.style.color = "var(--accent-red)";
+                }
+            } catch (error) {
+                console.error("Error fetching module:", error);
+                loaderText.innerText = "Connection error. Failed to retrieve module.";
+                loaderText.style.color = "var(--accent-red)";
+            }
+        };
+
+        window.renderQuestion = (idx) => {
+            const qData = currentModuleQuestions[idx];
+            selectedAnswer = null;
+            isAnswered = false;
+            
+            // Update Progress UI
+            const progressPercent = ((idx) / currentModuleQuestions.length) * 100;
+            document.getElementById('modal-progress-fill').style.width = `${progressPercent}%`;
+            document.getElementById('question-meta-text').innerText = `Question ${idx + 1} of ${currentModuleQuestions.length}`;
+            
+            // Render Text & Options
+            document.getElementById('dynamic-question-text').innerText = qData.text;
+            const optionsGrid = document.getElementById('dynamic-options-grid');
+            optionsGrid.innerHTML = ''; // Clear old options
+            
+            qData.options.forEach(opt => {
+                const optHtml = `
+                    <div class="quiz-option" id="opt-${opt.letter}" onclick="selectOption(this, '${opt.letter}')">
+                        <div class="option-letter">${opt.letter}</div>
+                        <div class="option-text-content">${opt.text}</div>
+                    </div>
+                `;
+                optionsGrid.innerHTML += optHtml;
+            });
+
+            // Reset Button & Feedback
+            const submitBtn = document.getElementById('modal-submit-btn');
+            submitBtn.innerHTML = 'Submit Answer <i class="fa-solid fa-arrow-right"></i>';
+            submitBtn.style.background = ''; // reset to default gradient
+            
+            document.getElementById('modal-feedback-success').style.display = 'none';
+            document.getElementById('modal-feedback-error').style.display = 'none';
+        };
+
+        window.selectOption = (element, letter) => {
+            if (isAnswered) return; // Prevent changing answer after submission
+
+            selectedAnswer = letter;
+            document.querySelectorAll('.quiz-option').forEach(opt => opt.classList.remove('selected'));
+            element.classList.add('selected');
+        };
+
+        window.submitModalAnswer = () => {
+            const submitBtn = document.getElementById('modal-submit-btn');
+            
+            // If already answered, act as the "Next" button
+            if (isAnswered) {
+                if (currentQuestionIdx < currentModuleQuestions.length - 1) {
+                    currentQuestionIdx++;
+                    renderQuestion(currentQuestionIdx);
+                } else {
+                    // Module Complete
+                    closeModule();
+                    alert("Module Completed Successfully! Data sent to backend.");
+                }
+                return;
+            }
+
+            // Normal Submission flow
+            if (!selectedAnswer) {
+                alert("Please select an option before submitting.");
+                return;
+            }
+
+            const currentQ = currentModuleQuestions[currentQuestionIdx];
+            const isCorrect = (selectedAnswer === currentQ.correctAnswer);
+            isAnswered = true; // Lock the answers
+
+            const selectedEl = document.getElementById(`opt-${selectedAnswer}`);
+
+            if (isCorrect) {
+                document.getElementById('modal-feedback-success').style.display = 'flex';
+                selectedEl.style.borderColor = "var(--accent-green)";
+                selectedEl.querySelector('.option-letter').style.background = "var(--accent-green)";
+            } else {
+                document.getElementById('modal-feedback-error').style.display = 'flex';
+                selectedEl.style.animation = 'shake 0.4s';
+                selectedEl.style.borderColor = "var(--accent-red)";
+                selectedEl.querySelector('.option-letter').style.background = "var(--accent-red)";
+            }
+
+            // Update button text for the next action
+            if (currentQuestionIdx < currentModuleQuestions.length - 1) {
+                submitBtn.innerHTML = 'Next Question <i class="fa-solid fa-arrow-right"></i>';
+            } else {
+                submitBtn.innerHTML = 'Finish Module <i class="fa-solid fa-check-circle"></i>';
+                submitBtn.style.background = 'linear-gradient(135deg, var(--accent-green), #059669)';
+            }
+        };
+
+        window.closeModule = () => {
+            document.getElementById('module-overlay').classList.remove('active');
+            // Give time for animation to finish before clearing content
+            setTimeout(() => {
+                document.getElementById('question-block').style.display = 'none';
+            }, 300);
+        };
+    </script>
+</body>
+</html>

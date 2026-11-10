@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill Ignite - Skill Radar</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Import Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
+
+        /* CSS Variables & Theme (Minimal Modern) */
+        :root {
+            --bg-primary: #0F1115;
+            --bg-secondary: #181A20;
+            --bg-tertiary: #22252B;
+            
+            --accent-blue: #3B82F6;
+            --accent-purple: #8B5CF6;
+            --accent-green: #10B981;
+            --accent-red: #EF4444;
+            --accent-yellow: #F59E0B;
+            
+            --text-primary: #FFFFFF;
+            --text-secondary: #A0AEC0;
+            --text-tertiary: #718096;
+            
+            --border-color: rgba(255, 255, 255, 0.06);
+            --glass-bg: rgba(24, 26, 32, 0.4);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            
+            --glow-blue: 0 0 15px rgba(59, 130, 246, 0.2);
+            --glow-purple: 0 0 15px rgba(139, 92, 246, 0.2);
+            
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Poppins', sans-serif;
+            
+            --border-radius-sm: 10px;
+            --border-radius-md: 16px;
+            --border-radius-lg: 24px;
+            --border-radius-round: 50%;
+            
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            
+            --sidebar-width: 260px;
+            --topbar-height: 80px;
+        }
+
+        /* Base Resets */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+        }
+        a { text-decoration: none; color: inherit; }
+        button { cursor: pointer; border: none; background: none; font-family: inherit; }
+        ul { list-style: none; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--bg-tertiary); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+
+        /* Typography */
+        h1, h2, h3, h4 { font-family: var(--font-heading); font-weight: 600; color: var(--text-primary); }
+        .text-h2 { font-size: 2rem; letter-spacing: -0.5px; }
+        .text-h3 { font-size: 1.5rem; }
+        .text-h4 { font-size: 1.1rem; letter-spacing: 0.2px; }
+        .text-body { font-size: 0.95rem; color: var(--text-secondary); line-height: 1.6; }
+        .text-small { font-size: 0.85rem; color: var(--text-tertiary); }
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Layout */
+        .app-container { display: flex; width: 100%; height: 100vh; }
+        .main-content { flex-grow: 1; display: flex; flex-direction: column; height: 100%; overflow-y: auto; position: relative; }
+        .content-wrapper { padding: 32px 40px; max-width: 1400px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-md);
+            box-shadow: var(--glass-shadow);
+        }
+
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .fade-in { animation: fadeIn 0.5s ease forwards; }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width); height: 100vh;
+            background-color: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            padding: 32px 0; display: flex; flex-direction: column;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .brand { padding: 0 28px 40px; display: flex; align-items: center; gap: 12px; }
+        .brand-icon {
+            width: 32px; height: 32px;
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            border-radius: 8px; display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: bold; font-size: 16px; box-shadow: var(--glow-blue);
+        }
+        .brand-text { font-size: 1.4rem; font-weight: 700; letter-spacing: -0.5px; }
+
+        .nav-links { display: flex; flex-direction: column; gap: 4px; padding: 0 16px; flex-grow: 1; }
+        .nav-item {
+            display: flex; align-items: center; gap: 14px; padding: 14px 20px;
+            border-radius: var(--border-radius-sm); color: var(--text-secondary);
+            font-weight: 500; font-size: 0.95rem; transition: all var(--transition-fast); position: relative;
+        }
+        .nav-item:hover { background-color: rgba(255, 255, 255, 0.03); color: var(--text-primary); }
+        .nav-item.active { background: rgba(59, 130, 246, 0.08); color: var(--accent-blue); font-weight: 600; }
+        .nav-item.active::before {
+            content: ''; position: absolute; left: 0; top: 15%; height: 70%; width: 3px;
+            background: var(--accent-blue); border-radius: 0 4px 4px 0;
+        }
+        .nav-item i { font-size: 1.1rem; width: 24px; text-align: center; }
+
+        /* Topbar Styles */
+        .topbar {
+            height: var(--topbar-height); width: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 40px; background: rgba(15, 17, 21, 0.6);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+        .topbar-title { font-size: 1.25rem; font-family: var(--font-heading); font-weight: 600; }
+        .user-controls { display: flex; align-items: center; gap: 24px; }
+        
+        .icon-btn {
+            position: relative; width: 40px; height: 40px;
+            border-radius: var(--border-radius-round);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--text-secondary); transition: all var(--transition-fast);
+            border: 1px solid var(--border-color); background: rgba(255,255,255,0.02);
+        }
+        .icon-btn:hover { color: var(--text-primary); background-color: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
+
+        .user-profile { display: flex; align-items: center; gap: 12px; cursor: pointer; padding: 4px; border-radius: 30px; transition: background 0.2s; }
+        .user-profile:hover { background: rgba(255,255,255,0.03); }
+        .avatar { width: 36px; height: 36px; border-radius: var(--border-radius-round); object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: 600; font-size: 0.85rem; }
+        .user-role { color: var(--text-tertiary); font-size: 0.7rem; }
+
+        /* --- RADAR PAGE SPECIFIC --- */
+        .header-section { margin-bottom: 32px; }
+        
+        .radar-layout {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 24px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 1024px) {
+            .radar-layout { grid-template-columns: 1fr; }
+        }
+
+        .chart-container {
+            padding: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 500px;
+            position: relative;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            max-height: 500px;
+        }
+
+        .breakdown-container {
+            padding: 32px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-item { margin-bottom: 20px; animation: fadeIn 0.5s ease forwards; }
+        .stat-header {
+            display: flex; justify-content: space-between;
+            font-size: 0.9rem; font-weight: 500; color: var(--text-primary);
+            margin-bottom: 8px; align-items: center;
+        }
+        .stat-bar-bg {
+            width: 100%; height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 4px; overflow: hidden;
+        }
+        .stat-bar-fill {
+            height: 100%; border-radius: 4px;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .loader-overlay {
+            position: absolute; inset: 0; background: var(--bg-secondary);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            z-index: 10; gap: 16px; border-radius: inherit; transition: opacity 0.3s;
+        }
+        .spinner {
+            width: 40px; height: 40px; border: 3px solid rgba(59, 130, 246, 0.2);
+            border-top-color: var(--accent-blue); border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Estimation Modal Styles */
+        .estimation-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: rgba(15, 17, 21, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            z-index: 1000; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: all 0.3s ease;
+        }
+        .estimation-overlay.active { opacity: 1; pointer-events: auto; }
+
+        .estimation-modal {
+            background: var(--bg-secondary); border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-lg); box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            padding: 40px; max-width: 600px; width: 90%;
+            transform: translateY(30px); transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .estimation-overlay.active .estimation-modal { transform: translateY(0); }
+
+        .slider-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px 30px;
+            margin-bottom: 32px;
+            margin-top: 24px;
+        }
+
+        @media (max-width: 600px) {
+            .slider-grid { grid-template-columns: 1fr; }
+        }
+
+        .slider-group { display: flex; flex-direction: column; gap: 10px; }
+        .slider-group label { display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--text-secondary); font-weight: 500; }
+        .slider-group input[type="range"] {
+            -webkit-appearance: none; width: 100%; height: 6px; background: rgba(255,255,255,0.05);
+            border-radius: 3px; outline: none; border: 1px solid var(--border-color);
+        }
+        .slider-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none; appearance: none; width: 18px; height: 18px;
+            border-radius: 50%; background: var(--accent-yellow); cursor: pointer; transition: 0.2s;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+        }
+        .slider-group input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.2); box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+
+        .btn-activate {
+            background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+            color: white; padding: 14px 24px; border-radius: 30px; font-weight: 600; width: 100%;
+            border: none; cursor: pointer; transition: all 0.2s; box-shadow: var(--glow-blue);
+            font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 10px;
+        }
+        .btn-activate:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59, 130, 246, 0.4); }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-icon"><i class="fa-solid fa-microchip"></i></div>
+                <div class="brand-text">Skill<span class="text-gradient">Ignite</span></div>
+            </div>
+            <ul class="nav-links">
+                <a href="index.html" class="nav-item">
+                    <i class="fa-solid fa-border-all"></i> <span>Dashboard</span>
+                </a>
+                <a href="learning.html" class="nav-item">
+                    <i class="fa-solid fa-layer-group"></i> <span>Learning Tiers</span>
+                </a>
+                <a href="interview.html" class="nav-item">
+                    <i class="fa-solid fa-robot"></i> <span>AI Interview</span>
+                </a>
+                <a href="visual-test.html" class="nav-item">
+                    <i class="fa-solid fa-diagram-project"></i> <span>Visual Test</span>
+                </a>
+                <a href="radar.html" class="nav-item active">
+                    <i class="fa-solid fa-satellite-dish"></i> <span>Skill Radar</span>
+                </a>
+                <div style="flex-grow: 1;"></div>
+                <a href="home.html" class="nav-item" style="color: var(--text-tertiary);">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i> <span>Sign Out</span>
+                </a>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-title">Multidimensional Analysis</div>
+                <div class="user-controls">
+                    <div class="user-profile">
+                        <img src="https://ui-avatars.com/api/?name=Alex+M&background=22252B&color=fff" alt="User Avatar" class="avatar">
+                        <div class="user-info">
+                            <span class="user-name" id="profile-name">Loading...</span>
+                            <span class="user-role">EV Systems Eng. Level 2</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-wrapper fade-in">
+                
+                <div class="header-section">
+                    <h1 class="text-h2">Skill Radar Profile</h1>
+                    <p class="text-body mt-2">Compare your self-assessed proficiency against your actual AI-verified database telemetry.</p>
+                </div>
+
+                <div class="radar-layout">
+                    <!-- Left: Radar Chart -->
+                    <div class="glass-panel chart-container">
+                        <div class="loader-overlay" id="chart-loader" style="display: none; opacity: 0;">
+                            <div class="spinner"></div>
+                            <span class="text-small text-secondary">Fetching Live Telemetry Data...</span>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="skillRadarChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Right: Breakdown Stats -->
+                    <div class="glass-panel breakdown-container">
+                        <h3 class="text-h4" style="margin-bottom: 24px; border-bottom: 1px solid var(--border-color); padding-bottom: 16px;">
+                            <i class="fa-solid fa-chart-bar" style="color: var(--accent-purple); margin-right: 8px;"></i> Capability Breakdown
+                        </h3>
+                        
+                        <div id="breakdown-list">
+                            <div class="text-small text-tertiary">Awaiting Self-Assessment Calibration...</div>
+                        </div>
+                        
+                        <div style="margin-top: auto; padding-top: 24px; text-align: center;">
+                            <button class="btn-sleek" style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); color: var(--accent-blue); padding: 10px 20px; border-radius: 30px; font-weight: 500; font-size: 0.9rem; transition: all var(--transition-fast);" onclick="window.location.href='learning.html'">
+                                Improve Scores <i class="fa-solid fa-arrow-right" style="margin-left: 6px;"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Self Assessment Modal -->
+    <div class="estimation-overlay active" id="estimation-overlay">
+        <div class="estimation-modal">
+            <h3 class="text-h3" style="margin-bottom: 12px;">
+                <i class="fa-solid fa-scale-balanced" style="color: var(--accent-yellow); margin-right: 8px;"></i> Calibration Setup
+            </h3>
+            <p class="text-body" style="color: var(--text-secondary);">Before analyzing your actual database telemetry, please estimate your current confidence and proficiency levels.</p>
+
+            <div class="slider-grid">
+                <div class="slider-group">
+                    <label>Battery Management <span style="color: var(--text-primary);"><span id="val-est-battery">50</span>%</span></label>
+                    <input type="range" id="est-battery" min="0" max="100" value="50" oninput="document.getElementById('val-est-battery').innerText=this.value">
+                </div>
+                <div class="slider-group">
+                    <label>Thermal Dynamics <span style="color: var(--text-primary);"><span id="val-est-thermal">50</span>%</span></label>
+                    <input type="range" id="est-thermal" min="0" max="100" value="50" oninput="document.getElementById('val-est-thermal').innerText=this.value">
+                </div>
+                <div class="slider-group">
+                    <label>CAN Bus Protocols <span style="color: var(--text-primary);"><span id="val-est-canbus">50</span>%</span></label>
+                    <input type="range" id="est-canbus" min="0" max="100" value="50" oninput="document.getElementById('val-est-canbus').innerText=this.value">
+                </div>
+                <div class="slider-group">
+                    <label>System Diagnostics <span style="color: var(--text-primary);"><span id="val-est-diag">50</span>%</span></label>
+                    <input type="range" id="est-diag" min="0" max="100" value="50" oninput="document.getElementById('val-est-diag').innerText=this.value">
+                </div>
+                <div class="slider-group">
+                    <label>HV Safety Protocols <span style="color: var(--text-primary);"><span id="val-est-safety">50</span>%</span></label>
+                    <input type="range" id="est-safety" min="0" max="100" value="50" oninput="document.getElementById('val-est-safety').innerText=this.value">
+                </div>
+                <div class="slider-group">
+                    <label>Overall Logic Confidence <span style="color: var(--text-primary);"><span id="val-est-conf">50</span>%</span></label>
+                    <input type="range" id="est-conf" min="0" max="100" value="50" oninput="document.getElementById('val-est-conf').innerText=this.value">
+                </div>
+            </div>
+
+            <button class="btn-activate" onclick="submitEstimation()">
+                Generate Comparison Radar <i class="fa-solid fa-satellite-dish"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Firebase Integration for Real-Time Radar -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Your exact Firebase config
+        const firebaseConfig = {
+            apiKey: "AIzaSyB5hQdKwZxu4_c5TRagEnsa5mePmhEJ2yQ",
+            authDomain: "skill-ignite-6ef21.firebaseapp.com",
+            projectId: "skill-ignite-6ef21",
+            storageBucket: "skill-ignite-6ef21.firebasestorage.app",
+            messagingSenderId: "1052814923538",
+            appId: "1:1052814923538:web:53965e1039b75f02b6c5cb",
+            measurementId: "G-2C5CYQ16P3"
+        };
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-skill-ignite';
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Chart.js Setup
+        const ctx = document.getElementById('skillRadarChart').getContext('2d');
+        
+        // Define gradient for the actual radar fill
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(139, 92, 246, 0.5)'); // Purple
+        gradient.addColorStop(1, 'rgba(59, 130, 246, 0.5)'); // Blue
+
+        let radarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+                labels: ['Battery Management', 'Thermal Dynamics', 'CAN Bus Protocols', 'System Diagnostics', 'HV Safety', 'Logic & Confidence'],
+                datasets: [
+                    // Empty datasets to be filled after estimation
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(255, 255, 255, 0.1)' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)', circular: true },
+                        pointLabels: { 
+                            color: '#A0AEC0', 
+                            font: { family: 'Inter', size: 13, weight: '500' } 
+                        },
+                        ticks: { display: false, min: 0, max: 100, stepSize: 20 }
+                    }
+                },
+                plugins: {
+                    legend: { 
+                        display: true,
+                        position: 'bottom',
+                        labels: { color: '#FFFFFF', font: { family: 'Inter', size: 13 } }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(24, 26, 32, 0.9)',
+                        titleFont: { family: 'Inter', size: 14 },
+                        bodyFont: { family: 'Inter', size: 14, weight: 'bold' },
+                        padding: 12,
+                        cornerRadius: 8,
+                        displayColors: true,
+                        callbacks: {
+                            label: function(context) {
+                                return context.dataset.label + ': ' + context.raw + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        let currentUser = null;
+
+        // Base Authentication Tracker
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                // Fetch just the user name immediately for the top bar
+                try {
+                    const userDocRef = doc(db, 'artifacts', appId, 'users', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+                    if (userDoc.exists()) {
+                        const profileEl = document.getElementById('profile-name');
+                        if (profileEl) profileEl.innerText = userDoc.data().fullName || 'Engineer';
+                    }
+                } catch(e) {}
+            } else {
+                window.location.href = 'auth.html';
+            }
+        });
+
+        // Delta Calculation Helper
+        const getDeltaHtml = (actual, estimated) => {
+            const delta = actual - estimated;
+            if (delta > 0) return `<span style="color: var(--accent-green); font-size: 0.75rem; margin-left: 8px;">(+${delta})</span>`;
+            if (delta < 0) return `<span style="color: var(--accent-red); font-size: 0.75rem; margin-left: 8px;">(${delta})</span>`;
+            return `<span style="color: var(--text-tertiary); font-size: 0.75rem; margin-left: 8px;">(Match)</span>`;
+        };
+
+        // Main Logic triggered by Modal submission
+        window.submitEstimation = async () => {
+            if (!currentUser) return;
+
+            // 1. UI Transitions
+            document.getElementById('estimation-overlay').classList.remove('active');
+            const loader = document.getElementById('chart-loader');
+            loader.style.display = 'flex';
+            setTimeout(() => loader.style.opacity = '1', 10);
+
+            // 2. Capture Form Data
+            const eBatt = parseInt(document.getElementById('est-battery').value);
+            const eTherm = parseInt(document.getElementById('est-thermal').value);
+            const eCan = parseInt(document.getElementById('est-canbus').value);
+            const eDiag = parseInt(document.getElementById('est-diag').value);
+            const eSafety = parseInt(document.getElementById('est-safety').value);
+            const eConf = parseInt(document.getElementById('est-conf').value);
+            const estimatedDataArray = [eBatt, eTherm, eCan, eDiag, eSafety, eConf];
+
+            // 3. Fetch Actual Data from DB
+            try {
+                const userDocRef = doc(db, 'artifacts', appId, 'users', currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
+                
+                let actualDataArray = [0, 0, 0, 0, 0, 0];
+                let stats = { battery: 0, thermal: 0, canBus: 0, confidence: 0 };
+                let diagScore = 0;
+                let safetyScore = 0;
+
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    stats = userData.stats || stats;
+                    diagScore = Math.round((stats.battery + stats.canBus) / 2) || 0;
+                    safetyScore = Math.round((stats.battery + stats.thermal) / 2) || 0;
+                    actualDataArray = [stats.battery, stats.thermal, stats.canBus, diagScore, safetyScore, stats.confidence];
+                }
+
+                // 4. Populate Radar Chart with BOTH datasets
+                radarChart.data.datasets = [
+                    {
+                        label: 'Actual DB Proficiency',
+                        data: actualDataArray,
+                        backgroundColor: gradient,
+                        borderColor: 'rgba(139, 92, 246, 1)',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#0F1115',
+                        pointBorderColor: 'rgba(59, 130, 246, 1)',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(59, 130, 246, 1)',
+                        pointHoverRadius: 6,
+                    },
+                    {
+                        label: 'Self-Estimated',
+                        data: estimatedDataArray,
+                        backgroundColor: 'rgba(245, 158, 11, 0.15)', // Transparent Yellow
+                        borderColor: 'rgba(245, 158, 11, 1)',
+                        borderWidth: 2,
+                        borderDash: [6, 4],
+                        pointBackgroundColor: '#0F1115',
+                        pointBorderColor: 'rgba(245, 158, 11, 1)',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgba(245, 158, 11, 1)',
+                        pointHoverRadius: 6,
+                    }
+                ];
+                
+                radarChart.update();
+
+                // 5. Update Sidebar Breakdown with Actual + Delta
+                const breakdownHtml = `
+                    <div class="stat-item" style="animation-delay: 0.1s">
+                        <div class="stat-header"><span>Battery Management</span><span>${stats.battery}% ${getDeltaHtml(stats.battery, eBatt)}</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${stats.battery}%; background: var(--accent-blue);"></div></div>
+                    </div>
+                    <div class="stat-item" style="animation-delay: 0.2s">
+                        <div class="stat-header"><span>Thermal Dynamics</span><span>${stats.thermal}% ${getDeltaHtml(stats.thermal, eTherm)}</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${stats.thermal}%; background: var(--accent-red);"></div></div>
+                    </div>
+                    <div class="stat-item" style="animation-delay: 0.3s">
+                        <div class="stat-header"><span>CAN Bus Protocols</span><span>${stats.canBus}% ${getDeltaHtml(stats.canBus, eCan)}</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${stats.canBus}%; background: var(--accent-yellow);"></div></div>
+                    </div>
+                    <div class="stat-item" style="animation-delay: 0.4s">
+                        <div class="stat-header"><span>System Diagnostics</span><span>${diagScore}% ${getDeltaHtml(diagScore, eDiag)}</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${diagScore}%; background: var(--accent-purple);"></div></div>
+                    </div>
+                    <div class="stat-item" style="animation-delay: 0.5s">
+                        <div class="stat-header"><span>High Voltage Safety</span><span>${safetyScore}% ${getDeltaHtml(safetyScore, eSafety)}</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${safetyScore}%; background: var(--accent-green);"></div></div>
+                    </div>
+                    <div class="stat-item" style="animation-delay: 0.6s">
+                        <div class="stat-header"><span>Confidence Index</span><span>${stats.confidence}% ${getDeltaHtml(stats.confidence, eConf)}</span></div>
+                        <div class="stat-bar-bg"><div class="stat-bar-fill" style="width: ${stats.confidence}%; background: linear-gradient(90deg, var(--accent-blue), var(--accent-purple)); box-shadow: var(--glow-blue);"></div></div>
+                    </div>
+                `;
+                document.getElementById('breakdown-list').innerHTML = breakdownHtml;
+
+            } catch (err) {
+                console.error("Error fetching radar data:", err);
+                document.getElementById('breakdown-list').innerHTML = `<div class="text-small text-tertiary" style="color: var(--accent-red);">Failed to load database stats.</div>`;
+            }
+
+            // 6. Hide Loader
+            loader.style.opacity = '0';
+            setTimeout(() => loader.style.display = 'none', 300);
+        };
+    </script>
+</body>
+</html>
